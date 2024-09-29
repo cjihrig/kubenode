@@ -1,20 +1,22 @@
 {
-  "name": "kubenode",
+  "name": "@kubenode/controller-runtime",
   "version": "0.1.0",
-  "description": "Kubernetes and Node.js",
+  "description": "Kubernetes controller runtime",
   "license": "MIT",
   "author": "Colin J. Ihrig <cjihrig@gmail.com> (http://www.cjihrig.com/)",
   "main": "lib/index.js",
   "scripts": {
     "lint": "belly-button -f",
-    "pretest": "npm run lint",
-    "test": "node --test"
+    "pretest": "npm run lint && tsc --noEmit",
+    "test": "node --test --experimental-test-coverage",
+    "types": "node scripts/clean-types.js && tsc"
   },
   "dependencies": {
     "@kubernetes/client-node": "^0.22.0"
   },
   "devDependencies": {
-    "belly-button": "^8.0.0"
+    "belly-button": "^8.0.0",
+    "typescript": "^5.6.2"
   },
   "homepage": "https://github.com/cjihrig/kubenode#readme",
   "repository": {
@@ -26,6 +28,12 @@
   },
   "keywords": [
     "kubernetes",
-    "k8s"
-  ]
+    "k8s",
+    "controller",
+    "runtime"
+  ],
+  "directories": {
+    "lib": "lib",
+    "test": "test"
+  }
 }

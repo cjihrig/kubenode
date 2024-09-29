@@ -1,0 +1,10 @@
+import k8s = require("@kubernetes/client-node");
+import { Manager } from "./manager";
+export const newControllerManagedBy: typeof Builder.controllerManagedBy;
+import { Reconciler } from "./reconcile";
+import { Request } from "./reconcile";
+import { Result } from "./reconcile";
+import { Source } from "./source";
+import { TerminalError } from "./reconcile";
+import { Builder } from "./builder";
+export { k8s, Manager, Reconciler, Request, Result, Source, TerminalError };

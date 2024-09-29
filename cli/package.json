@@ -1,0 +1,38 @@
+{
+  "name": "@kubenode/cli",
+  "version": "0.1.0",
+  "description": "Kubenode CLI",
+  "license": "MIT",
+  "author": "Colin J. Ihrig <cjihrig@gmail.com> (http://www.cjihrig.com/)",
+  "main": "lib/index.js",
+  "scripts": {
+    "lint": "belly-button -f",
+    "pretest": "npm run lint && tsc --noEmit --resolveJsonModule",
+    "test": "node --test --experimental-test-coverage",
+    "types": "rm lib/*.d.ts && tsc"
+  },
+  "devDependencies": {
+    "@types/node": "^22.7.5",
+    "belly-button": "^8.0.0",
+    "typescript": "^5.6.2"
+  },
+  "homepage": "https://github.com/cjihrig/kubenode#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cjihrig/kubenode.git"
+  },
+  "bugs": {
+    "url": "https://github.com/cjihrig/kubenode/issues"
+  },
+  "keywords": [
+    "kubernetes",
+    "k8s"
+  ],
+  "directories": {
+    "lib": "lib",
+    "test": "test"
+  },
+  "dependencies": {
+    "pluralize": "^8.0.0"
+  }
+}

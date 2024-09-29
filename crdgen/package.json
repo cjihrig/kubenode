@@ -1,0 +1,38 @@
+{
+  "name": "@kubenode/crdgen",
+  "version": "0.1.0",
+  "description": "Kubernetes Custom Resource Definition Generator",
+  "license": "MIT",
+  "author": "Colin J. Ihrig <cjihrig@gmail.com> (http://www.cjihrig.com/)",
+  "main": "lib/index.js",
+  "scripts": {
+    "lint": "belly-button -f",
+    "pretest": "npm run lint && tsc --noEmit",
+    "test": "node --test --experimental-test-coverage",
+    "types": "rm lib/*.d.ts && tsc"
+  },
+  "dependencies": {
+    "pluralize": "^8.0.0",
+    "typescript": "^5.6.2"
+  },
+  "devDependencies": {
+    "belly-button": "^8.0.0"
+  },
+  "homepage": "https://github.com/cjihrig/kubenode#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cjihrig/kubenode.git"
+  },
+  "bugs": {
+    "url": "https://github.com/cjihrig/kubenode/issues"
+  },
+  "keywords": [
+    "kubernetes",
+    "k8s",
+    "crd"
+  ],
+  "directories": {
+    "lib": "lib",
+    "test": "test"
+  }
+}
