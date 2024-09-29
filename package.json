@@ -1,0 +1,31 @@
+{
+  "name": "kubenode",
+  "version": "0.1.0",
+  "description": "Kubernetes and Node.js",
+  "license": "MIT",
+  "author": "Colin J. Ihrig <cjihrig@gmail.com> (http://www.cjihrig.com/)",
+  "main": "lib/index.js",
+  "scripts": {
+    "lint": "belly-button -f",
+    "pretest": "npm run lint",
+    "test": "node --test"
+  },
+  "dependencies": {
+    "@kubernetes/client-node": "^0.22.0"
+  },
+  "devDependencies": {
+    "belly-button": "^8.0.0"
+  },
+  "homepage": "https://github.com/cjihrig/kubenode#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cjihrig/kubenode.git"
+  },
+  "bugs": {
+    "url": "https://github.com/cjihrig/kubenode/issues"
+  },
+  "keywords": [
+    "kubernetes",
+    "k8s"
+  ]
+}
