@@ -5,10 +5,12 @@ const rootCommand = {
   description: 'Kubernetes tools for Node.js',
   subcommands() {
     const add = require('./add');
+    const codegen = require('./codegen');
     const init = require('./init');
     // @ts-ignore
     const commands = new Map([
       [add.command, add],
+      [codegen.command, codegen],
       [init.command, init]
     ]);
 

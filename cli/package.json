@@ -1,6 +1,6 @@
 {
   "name": "@kubenode/cli",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Kubenode CLI",
   "license": "MIT",
   "author": "Colin J. Ihrig <cjihrig@gmail.com> (http://www.cjihrig.com/)",
@@ -33,6 +33,8 @@
     "test": "test"
   },
   "dependencies": {
+    "@kubenode/crdgen": "^0.1.0",
+    "js-yaml": "^4.1.0",
     "pluralize": "^8.0.0"
   }
 }

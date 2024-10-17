@@ -39,11 +39,14 @@ async function run(flags, positionals) {
   const ctrlFile = `${singular}.js`;
   const ctrl = join(ctrlDir, ctrlFile);
   const typePath = join(ctrlDir, `${singular}_types.ts`);
+  const sampleDir = join(projectDir, 'config', 'samples');
+  const samplePath = join(sampleDir, `${gvDirName}_${singular}.yaml`);
   const data = {
     group: flags.group,
     kind,
     listKind,
     plural,
+    projectName: project.projectName,
     singular,
     version: flags.version
   };
@@ -56,7 +59,9 @@ async function run(flags, positionals) {
   });
   lazyLoadTemplates();
   mkdirSync(ctrlDir, { recursive: true });
+  mkdirSync(sampleDir, { recursive: true });
   writeFileSync(ctrl, templates.controller(data));
+  writeFileSync(samplePath, templates.sample(data));
   writeFileSync(typePath, templates.types(data));
 
   // TODO(cjihrig): Scaffold sample resources.

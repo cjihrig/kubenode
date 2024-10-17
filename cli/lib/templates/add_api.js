@@ -22,7 +22,23 @@ export class ${data.kind}Reconciler extends Reconciler {
 `;
 }
 
+function sample(data) {
+  return `apiVersion: ${data.group}/${data.version}
+kind: ${data.kind}
+metadata:
+  labels:
+    app.kubernetes.io/name: ${data.projectName}
+    app.kubernetes.io/managed-by: kubenode
+  name: sample-${data.singular}
+  namespace:
+spec:
+  # TODO: Add fields here
+`;
+}
+
 function types(data) {
+  // Note, the `metadata` field does not have a @description because it causes
+  // an error when creating the CRD in the cluster.
   return `/**
  * @kubenode
  * @apiVersion ${data.group}/${data.version}
@@ -47,7 +63,7 @@ type ${data.kind} = {
   kind: string;
 
   /**
-   * @description metadata is a standard Kubernetes object for metadata.
+   * metadata is a standard Kubernetes object for metadata.
    */
   metadata: object;
 
@@ -97,5 +113,6 @@ type ${data.listKind} = {
 
 module.exports = {
   controller,
+  sample,
   types
 };
