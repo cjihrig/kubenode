@@ -1,6 +1,6 @@
 {
   "name": "kubenode",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Kubernetes and Node.js",
   "license": "MIT",
   "author": "Colin J. Ihrig <cjihrig@gmail.com> (http://www.cjihrig.com/)",
