@@ -24,6 +24,10 @@ let templates;
 
 // eslint-disable-next-line require-await
 async function run(flags, positionals) {
+  if (flags.domain === undefined) {
+    throw new Error('--domain must be specified');
+  }
+
   const projectDir = resolve(flags.directory);
   const srcDir = join(projectDir, 'lib');
   const packageJson = join(projectDir, 'package.json');

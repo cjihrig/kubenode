@@ -28,6 +28,18 @@ const flags = {
 let templates;
 
 async function run(flags, positionals) {
+  if (flags.group === undefined) {
+    throw new Error('--group must be specified');
+  }
+
+  if (flags.kind === undefined) {
+    throw new Error('--kind must be specified');
+  }
+
+  if (flags.version === undefined) {
+    throw new Error('--version must be specified');
+  }
+
   const projectDir = resolve(flags.directory);
   const project = Project.fromDirectory(projectDir);
   const gvDirName = `${flags.group}_${flags.version}`.toLowerCase();
@@ -63,8 +75,6 @@ async function run(flags, positionals) {
   writeFileSync(ctrl, templates.controller(data));
   writeFileSync(samplePath, templates.sample(data));
   writeFileSync(typePath, templates.types(data));
-
-  // TODO(cjihrig): Scaffold sample resources.
 
   {
     // Update generated code in existing files.

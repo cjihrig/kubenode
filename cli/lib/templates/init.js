@@ -1,5 +1,5 @@
 'use strict';
-const cliPackageJson = require('../../package.json');
+const cliPackageJson = require('@kubenode/controller-runtime/package.json');
 
 function dockerfile(data) {
   return `FROM node:22-alpine

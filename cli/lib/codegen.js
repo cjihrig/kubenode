@@ -28,6 +28,18 @@ const flags = {
 
 // eslint-disable-next-line require-await
 async function run(flags, positionals) {
+  if (flags.group === undefined) {
+    throw new Error('--group must be specified');
+  }
+
+  if (flags.kind === undefined) {
+    throw new Error('--kind must be specified');
+  }
+
+  if (flags.version === undefined) {
+    throw new Error('--version must be specified');
+  }
+
   const projectDir = resolve(flags.directory);
   const gvDirName = `${flags.group}_${flags.version}`.toLowerCase();
   const ctrlDir = join(projectDir, 'lib', 'controller', gvDirName);
