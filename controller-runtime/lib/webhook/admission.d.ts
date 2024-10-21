@@ -89,9 +89,9 @@ type AdmissionResponseOptions = {
      */
     allowed: boolean;
     /**
-     * result contains extra details into why an admission request was denied.
+     * status contains extra details into why an admission request was denied.
      */
-    result?: any;
+    status?: any;
     /**
      * The patch body.
      */
@@ -152,7 +152,7 @@ declare class AdmissionReview {
  * @typedef {Object} AdmissionResponseOptions
  * @property {string} [uid] uid is an identifier for the individual request/response.
  * @property {boolean} allowed allowed indicates whether or not the admission request was permitted.
- * @property {Object} [result] result contains extra details into why an admission request was denied.
+ * @property {Object} [status] status contains extra details into why an admission request was denied.
  * @property {Object} [patch] The patch body.
  * @property {Object[]} [patches] patches are the JSON patches for mutating webhooks.
  * @property {Object} [auditAnnotations] auditAnnotations is an unstructured key value map set by remote admission controller
@@ -193,7 +193,7 @@ declare class AdmissionResponse {
     constructor(options: AdmissionResponseOptions);
     uid: string;
     allowed: boolean;
-    result: any;
+    status: any;
     patch: any;
     patches: any[];
     patchType: string;

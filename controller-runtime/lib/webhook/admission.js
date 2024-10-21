@@ -1,5 +1,5 @@
 'use strict';
-const metav1 = require('./apimachinery/meta/v1');
+const metav1 = require('../apimachinery/meta/v1');
 const kGroupName = 'admission.k8s.io';
 const kOperationConnect = 'CONNECT';
 const kOperationCreate = 'CREATE';
@@ -30,7 +30,7 @@ const kPatchTypeJSONPatch = 'JSONPatch';
  * @typedef {Object} AdmissionResponseOptions
  * @property {string} [uid] uid is an identifier for the individual request/response.
  * @property {boolean} allowed allowed indicates whether or not the admission request was permitted.
- * @property {Object} [result] result contains extra details into why an admission request was denied.
+ * @property {Object} [status] status contains extra details into why an admission request was denied.
  * @property {Object} [patch] The patch body.
  * @property {Object[]} [patches] patches are the JSON patches for mutating webhooks.
  * @property {Object} [auditAnnotations] auditAnnotations is an unstructured key value map set by remote admission controller
@@ -106,21 +106,21 @@ class AdmissionResponse {
     const {
       uid,
       allowed,
-      result,
+      status,
       patch,
       patches,
       auditAnnotations,
       warnings
     } = options;
 
-    if (result !== undefined &&
-        (result === null || typeof result !== 'object')) {
-      throw new TypeError('options.result must be an object');
+    if (status !== undefined &&
+        (status === null || typeof status !== 'object')) {
+      throw new TypeError('options.status must be an object');
     }
 
     this.uid = uid;
     this.allowed = allowed;
-    this.result = result;
+    this.status = status;
     this.patch = patch;
     this.patches = patches;
     this.patchType = undefined;
@@ -133,14 +133,14 @@ class AdmissionResponse {
    * @param {AdmissionRequest} req The request corresponding to this response.
    */
   complete(req) {
-    this.uid = req.uid;
+    this.uid = req?.uid;
 
-    if (this.result === undefined) {
-      this.result = {};
+    if (this.status === undefined) {
+      this.status = {};
     }
 
-    if (this.result.code === undefined) {
-      this.result.code = 200;
+    if (this.status.code === undefined) {
+      this.status.code = 200;
     }
 
     if (Array.isArray(this.patches) && this.patches.length > 0) {
@@ -212,7 +212,7 @@ function errored(code, err) {
 
   return new AdmissionResponse({
     allowed: false,
-    result: { code, message }
+    status: { code, message }
   });
 }
 
@@ -236,7 +236,7 @@ function validationResponse(allowed, message) {
 
   return new AdmissionResponse({
     allowed,
-    result: { code, reason, message }
+    status: { code, reason, message }
   });
 }
 
