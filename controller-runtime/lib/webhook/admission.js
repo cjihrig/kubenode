@@ -1,5 +1,5 @@
 'use strict';
-const metav1 = require('./apimachinery/meta/v1');
+const metav1 = require('../apimachinery/meta/v1');
 const kGroupName = 'admission.k8s.io';
 const kOperationConnect = 'CONNECT';
 const kOperationCreate = 'CREATE';
