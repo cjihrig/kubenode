@@ -62,13 +62,18 @@ async function run(flags, positionals) {
     singular,
     version: flags.version
   };
-
-  project.addResource({
-    controller: true,
+  const resource = project.ensureResource({
     group: data.group,
     kind: data.kind,
     version: data.version
   });
+
+  if (resource.controller) {
+    const gvk = `${resource.kind}.${resource.group}/${resource.version}`;
+    throw new Error(`resource '${gvk}' already has a controller`);
+  }
+
+  resource.controller = true;
   lazyLoadTemplates();
   mkdirSync(ctrlDir, { recursive: true });
   mkdirSync(sampleDir, { recursive: true });

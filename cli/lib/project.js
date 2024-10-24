@@ -50,41 +50,7 @@ class Project {
     }
 
     for (let i = 0; i < resources.length; ++i) {
-      const r = resources[i];
-
-      if (typeof r.group !== 'string') {
-        throw new TypeError(
-          `project.resources[${i}].group must be a string`
-        );
-      }
-
-      if (typeof r.version !== 'string') {
-        throw new TypeError(
-          `project.resources[${i}].version must be a string`
-        );
-      }
-
-      if (typeof r.kind !== 'string') {
-        throw new TypeError(
-          `project.resources[${i}].kind must be a string`
-        );
-      }
-
-      if (r.controller === undefined) {
-        r.controller = false;
-      } else if (typeof r.controller !== 'boolean') {
-        throw new TypeError(
-          `project.resources[${i}].controller must be a boolean`
-        );
-      }
-
-      // TODO(cjihrig): These should be validated instead of only defaulting.
-      r.api = { crdVersion: 'v1', namespaced: true };
-      r.webhooks = {
-        defaulting: false,
-        validation: false,
-        webhookVersion: 'v1'
-      };
+      initializeResource(resources[i], `project.resources[${i}]`);
     }
 
     this.domain = domain;
@@ -95,16 +61,16 @@ class Project {
     this.resources = resources;
   }
 
-  addResource(r) {
+  ensureResource(r) {
     const existing = this.getResource(r.group, r.version, r.kind);
 
     if (existing) {
-      throw new Error(
-        `'${r.kind}.${r.group}/${r.version}' API already exists`
-      );
+      return existing;
     }
 
+    initializeResource(r, 'resource');
     this.resources.push(r);
+    return r;
   }
 
   getResource(group, version, kind) {
@@ -194,6 +160,68 @@ class Project {
         { cause: err }
       );
     }
+  }
+}
+
+function initializeResource(r, name) {
+  if (typeof r.group !== 'string') {
+    throw new TypeError(`${name}.group must be a string`);
+  }
+
+  if (typeof r.version !== 'string') {
+    throw new TypeError(`${name}.version must be a string`);
+  }
+
+  if (typeof r.kind !== 'string') {
+    throw new TypeError(`${name}.kind must be a string`);
+  }
+
+  if (r.controller === undefined) {
+    r.controller = false;
+  } else if (typeof r.controller !== 'boolean') {
+    throw new TypeError(`${name}.controller must be a boolean`);
+  }
+
+  if (r.api === undefined) {
+    r.api = {};
+  } else if (r.api === null || typeof r.api !== 'object') {
+    throw new TypeError(`${name}.api must be an object`);
+  }
+
+  if (r.api.crdVersion === undefined) {
+    r.api.crdVersion = 'v1';
+  } else if (r.api.crdVersion !== 'v1') {
+    throw new TypeError(`${name}.api.crdVersion must be 'v1'`);
+  }
+
+  if (r.api.namespaced === undefined) {
+    r.api.namespaced = true;
+  } else if (typeof r.api.namespaced !== 'boolean') {
+    throw new TypeError(`${name}.api.namespaced must be a boolean`);
+  }
+
+  if (r.webhooks === undefined) {
+    r.webhooks = {};
+  } else if (r.webhooks === null || typeof r.webhooks !== 'object') {
+    throw new TypeError(`${name}.webhooks must be an object`);
+  }
+
+  if (r.webhooks.defaulting === undefined) {
+    r.webhooks.defaulting = false;
+  } else if (typeof r.webhooks.defaulting !== 'boolean') {
+    throw new TypeError(`${name}.webhooks.defaulting must be a boolean`);
+  }
+
+  if (r.webhooks.validation === undefined) {
+    r.webhooks.validation = false;
+  } else if (typeof r.webhooks.validation !== 'boolean') {
+    throw new TypeError(`${name}.webhooks.validation must be a boolean`);
+  }
+
+  if (r.webhooks.webhookVersion === undefined) {
+    r.webhooks.webhookVersion = 'v1';
+  } else if (r.webhooks.webhookVersion !== 'v1') {
+    throw new TypeError(`${name}.webhooks.webhookVersion must be 'v1'`);
   }
 }
 

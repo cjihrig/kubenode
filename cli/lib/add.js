@@ -4,8 +4,10 @@ const kDescription = 'Add resources to a project';
 
 function subcommands() {
   const api = require('./add_api');
+  const webhook = require('./add_webhook');
   const commands = new Map([
-    [api.command, api]
+    [api.command, api],
+    [webhook.command, webhook]
   ]);
 
   return commands;
