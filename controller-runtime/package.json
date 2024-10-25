@@ -12,7 +12,7 @@
     "types": "node scripts/clean-types.js && tsc"
   },
   "dependencies": {
-    "@kubernetes/client-node": "^0.22.0"
+    "@kubernetes/client-node": "1.0.0-rc7"
   },
   "devDependencies": {
     "belly-button": "^8.0.0",

@@ -31,6 +31,7 @@ class Source {
     let apiVersion = this.apiVersion;
 
     if (apiVersion !== 'v1' && apiVersion.split('/').length === 1) {
+      // @ts-ignore
       const res = await this.client.getAPIVersions();
       const api = res?.body?.groups?.find((group) => {
         return group.name === apiVersion;
@@ -63,6 +64,7 @@ class Source {
     });
 
     this.informer.on('error', (err) => {
+      // @ts-ignore
       if (err?.code !== 'ECONNRESET') {
         throw err;
       }
