@@ -54,7 +54,32 @@ spec:
 `;
 }
 
+function webhook(data) {
+  const dashGroup = data.group.replaceAll('.', '-');
+  const path = `/${data.op}-${dashGroup}-${data.version}-${data.kind}`.toLowerCase();
+
+  return `// ATTENTION: YOU **SHOULD** EDIT THIS FILE!
+
+export class ${data.className} {
+  constructor() {
+    this.path = '${path}';
+  }
+
+  handler(context, request) {
+
+  }
+
+  setupWebhookWithManager(manager) {
+    const handler = this.handler.bind(this);
+
+    manager.getWebhookServer().register(this.path, handler);
+  }
+}
+`;
+}
+
 module.exports = {
   certificate,
-  service
+  service,
+  webhook
 };

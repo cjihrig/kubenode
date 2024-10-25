@@ -42,7 +42,6 @@ const flags = {
 };
 let templates;
 
-// eslint-disable-next-line require-await
 async function run(flags, positionals) {
   if (flags.group === undefined) {
     throw new Error('--group must be specified');
@@ -63,6 +62,10 @@ async function run(flags, positionals) {
   const projectDir = resolve(flags.directory);
   const project = Project.fromDirectory(projectDir);
   const kind = flags.kind.charAt(0).toUpperCase() + flags.kind.slice(1);
+  const gvDirName = `${flags.group}_${flags.version}`.toLowerCase();
+  const srcDir = join(projectDir, 'lib');
+  const main = join(srcDir, 'index.js');
+  const webhookSrcDir = join(srcDir, 'webhook', gvDirName);
   const certManagerDir = join(projectDir, 'config', 'certmanager');
   const certManagerFile = join(certManagerDir, 'certificate.yaml');
   const webhookDir = join(projectDir, 'config', 'webhook');
@@ -101,11 +104,42 @@ async function run(flags, positionals) {
   }
 
   lazyLoadTemplates();
+  mkdirSync(webhookSrcDir, { recursive: true });
   mkdirSync(certManagerDir, { recursive: true });
   mkdirSync(webhookDir, { recursive: true });
   writeFileSync(certManagerFile, templates.certificate(data));
   writeFileSync(serviceFile, templates.service(data));
   createOrUpdateManifestsFile(manifestsFile, data);
+
+  if (flags.validating) {
+    const filename = `${kind.toLowerCase()}_validating_webhook.js`;
+    const webhookSrcFile = join(webhookSrcDir, filename);
+    const className = `${data.kind}ValidatingWebhook`;
+    const hookImport = `import { ${className} } from ` +
+      `'./webhook/${gvDirName}/${filename}';`;
+    const hookSetup = `(new ${className}()).setupWebhookWithManager(manager);`;
+    const templateData = { ...data, className, op: 'validate' };
+
+    project.inject(main, '@kubenode:scaffold:imports', hookImport);
+    project.inject(main, '@kubenode:scaffold:manager', hookSetup);
+    writeFileSync(webhookSrcFile, templates.webhook(templateData));
+  }
+
+  if (flags.mutating) {
+    const filename = `${kind.toLowerCase()}_mutating_webhook.js`;
+    const webhookSrcFile = join(webhookSrcDir, filename);
+    const className = `${data.kind}MutatingWebhook`;
+    const hookImport = `import { ${className} } from ` +
+      `'./webhook/${gvDirName}/${filename}';`;
+    const hookSetup = `(new ${className}()).setupWebhookWithManager(manager);`;
+    const templateData = { ...data, className, op: 'mutate' };
+
+    project.inject(main, '@kubenode:scaffold:imports', hookImport);
+    project.inject(main, '@kubenode:scaffold:manager', hookSetup);
+    writeFileSync(webhookSrcFile, templates.webhook(templateData));
+  }
+
+  await project.writeMarkers();
   project.write();
 }
 
