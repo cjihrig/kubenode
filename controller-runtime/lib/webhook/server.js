@@ -33,7 +33,7 @@ let Readable;
 class Server {
   /**
    * Creates a new Server instance.
-   * @param {ServerOptions} options Options used to construct instance.
+   * @param {ServerOptions} [options] Options used to construct instance.
    */
   constructor(options) {
     if (options === undefined) {

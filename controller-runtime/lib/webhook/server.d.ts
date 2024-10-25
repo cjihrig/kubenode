@@ -31,9 +31,9 @@ export type ServerOptions = {
 export class Server {
     /**
      * Creates a new Server instance.
-     * @param {ServerOptions} options Options used to construct instance.
+     * @param {ServerOptions} [options] Options used to construct instance.
      */
-    constructor(options: ServerOptions);
+    constructor(options?: ServerOptions);
     context: any;
     port: number;
     requestHandler: any;

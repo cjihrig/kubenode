@@ -33,10 +33,20 @@ class Manager {
     this.controllers = [];
     this.kubeconfig = kubeconfig;
     this.started = false;
+    this.webhookServer = null;
   }
 
   add(controller) {
     this.controllers.push(controller);
+  }
+
+  getWebhookServer() {
+    if (this.webhookServer === null) {
+      const { Server } = require('./webhook/server');
+      this.webhookServer = new Server();
+    }
+
+    return this.webhookServer;
   }
 
   start(context = this.#defaultContext()) {
