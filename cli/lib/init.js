@@ -34,6 +34,8 @@ async function run(flags, positionals) {
   const dockerfile = join(projectDir, 'Dockerfile');
   const main = join(srcDir, 'index.js');
   const mainTest = join(srcDir, 'index.test.js');
+  const managerDir = join(projectDir, 'config', 'manager');
+  const managerConfig = join(managerDir, 'manager.yaml');
   const data = {
     domain: flags.domain,
     projectName: flags['project-name'],
@@ -44,10 +46,12 @@ async function run(flags, positionals) {
 
   lazyLoadTemplates();
   mkdirSync(srcDir, { recursive: true });
+  mkdirSync(managerDir, { recursive: true });
   writeFileSync(dockerfile, templates.dockerfile(data));
   writeFileSync(packageJson, templates.packageJson(data));
   writeFileSync(main, templates.main(data));
   writeFileSync(mainTest, templates.mainTest(data));
+  writeFileSync(managerConfig, templates.manager(data));
   project.write();
 }
 

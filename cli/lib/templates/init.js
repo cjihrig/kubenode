@@ -35,6 +35,75 @@ test('verify application functionality', () => {
 `;
 }
 
+function manager(data) {
+  return `apiVersion: v1
+kind: Namespace
+metadata:
+  name: ${data.projectName}
+  labels:
+    control-plane: controller-manager
+    app.kubernetes.io/name: namespace
+    app.kubernetes.io/instance: ${data.projectName}
+    app.kubernetes.io/component: manager
+    app.kubernetes.io/created-by: ${data.projectName}
+    app.kubernetes.io/part-of: ${data.projectName}
+    app.kubernetes.io/managed-by: kubenode
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: controller-manager
+  namespace: ${data.projectName}
+  labels:
+    control-plane: controller-manager
+    app.kubernetes.io/name: deployment
+    app.kubernetes.io/instance: controller-manager
+    app.kubernetes.io/component: manager
+    app.kubernetes.io/created-by: ${data.projectName}
+    app.kubernetes.io/part-of: ${data.projectName}
+    app.kubernetes.io/managed-by: kubenode
+spec:
+  selector:
+    matchLabels:
+      control-plane: controller-manager
+  replicas: 1
+  revisionHistoryLimit: 2
+  template:
+    metadata:
+      annotations:
+        kubectl.kubernetes.io/default-container: manager
+      labels:
+        control-plane: controller-manager
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+      - command:
+        - node
+        args:
+        - lib/index.js
+        image: controller:latest
+        imagePullPolicy: Always
+        name: manager
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+            - "ALL"
+        resources:
+          limits:
+            cpu: 500m
+            memory: 256Mi
+          requests:
+            cpu: 10m
+            memory: 128Mi
+      serviceAccountName: controller-manager
+      terminationGracePeriodSeconds: 10
+`;
+}
+
 function packageJson(data) {
   const pkg = {
     name: data.projectName,
@@ -57,5 +126,6 @@ module.exports = {
   dockerfile,
   main,
   mainTest,
+  manager,
   packageJson
 };
