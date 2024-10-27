@@ -71,6 +71,8 @@ async function run(flags, positionals) {
   const webhookDir = join(projectDir, 'config', 'webhook');
   const manifestsFile = join(webhookDir, 'manifests.yaml');
   const serviceFile = join(webhookDir, 'service.yaml');
+  const managerDir = join(projectDir, 'config', 'manager');
+  const managerConfig = join(managerDir, 'manager.yaml');
   const data = {
     group: flags.group,
     kind,
@@ -110,6 +112,7 @@ async function run(flags, positionals) {
   writeFileSync(certManagerFile, templates.certificate(data));
   writeFileSync(serviceFile, templates.service(data));
   createOrUpdateManifestsFile(manifestsFile, data);
+  updateManagerConfig(managerConfig, data);
 
   if (flags.validating) {
     const filename = `${kind.toLowerCase()}_validating_webhook.js`;
@@ -225,6 +228,95 @@ function manifestForHook(manifests, hookKind, data) {
   });
 
   return manifest;
+}
+
+function updateManagerConfig(filename, data) {
+  const yamlData = readFileSync(filename, 'utf8');
+  const body = yaml.loadAll(yamlData, null, { filename });
+  const deployment = body.find((m) => {
+    // @ts-ignore
+    return m?.kind === 'Deployment' &&
+      // @ts-ignore
+      m?.metadata?.name === 'controller-manager' &&
+      // @ts-ignore
+      m?.metadata?.namespace === data.projectName;
+  });
+
+  if (deployment === undefined) {
+    throw new Error(`could not find manager deployment in '${filename}'`);
+  }
+
+  // @ts-ignore
+  deployment.spec ??= {};
+  // @ts-ignore
+  deployment.spec.template ??= {};
+  // @ts-ignore
+  deployment.spec.template.spec ??= {};
+  // @ts-ignore
+  deployment.spec.template.spec.containers ??= [];
+  // @ts-ignore
+  deployment.spec.template.spec.volumes ??= [];
+
+  // @ts-ignore
+  const spec = deployment.spec.template.spec;
+  const containers = spec.containers;
+  const container = containers.find((c) => {
+    return c.name === 'manager';
+  });
+
+  if (container === undefined) {
+    throw new Error(`could not find manager container in '${filename}'`);
+  }
+
+  container.ports ??= [];
+  container.volumeMounts ??= [];
+
+  const port = container.ports.find((p) => {
+    return p?.name === 'webhook-server' && p?.protocol === 'TCP' &&
+      p?.containerPort === 9443;
+  });
+
+  if (port === undefined) {
+    container.ports.push({
+      name: 'webhook-server',
+      containerPort: 9443,
+      protocol: 'TCP'
+    });
+  }
+
+  const mount = container.volumeMounts.find((m) => {
+    return m?.name === 'cert';
+  });
+
+  if (mount === undefined) {
+    container.volumeMounts.push({
+      name: 'cert',
+      mountPath: '/tmp/k8s-webhook-server/serving-certs',
+      readOnly: true
+    });
+  }
+
+  const volumes = spec.volumes;
+  const volume = volumes.find((v) => {
+    return v?.name === 'cert' &&
+      v?.secret?.secretName === 'webhook-server-cert';
+  });
+
+  if (volume === undefined) {
+    volumes.push({
+      name: 'cert',
+      secret: {
+        defaultMode: 420,
+        secretName: 'webhook-server-cert'
+      }
+    });
+  }
+
+  const documents = body.map((doc) => {
+    return yaml.dump(doc);
+  });
+  const manifestYaml = documents.join('---\n');
+  writeFileSync(filename, manifestYaml);
 }
 
 module.exports = {
