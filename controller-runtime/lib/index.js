@@ -10,7 +10,33 @@ const {
 } = require('./reconcile');
 const { Source } = require('./source');
 const newControllerManagedBy = Builder.controllerManagedBy;
-let lazyWebhook;
+let lazyWebhookServer;
+let lazyWebhookAdmission;
+
+const webhook = {
+  /**
+   * @type {import("./webhook/server").Server}
+   */
+  get Server() {
+    if (lazyWebhookServer === undefined) {
+      const { Server } = require('./webhook/server');
+
+      lazyWebhookServer = Server;
+    }
+
+    return lazyWebhookServer;
+  },
+  /**
+   * @type {import("./webhook/admission")}
+   */
+  get admission() {
+    if (lazyWebhookAdmission === undefined) {
+      lazyWebhookAdmission = require('./webhook/admission');
+    }
+
+    return lazyWebhookAdmission;
+  }
+};
 
 module.exports = {
   k8s,
@@ -20,20 +46,6 @@ module.exports = {
   Request,
   Result,
   Source,
-  TerminalError
+  TerminalError,
+  webhook
 };
-
-Object.defineProperty(module.exports, 'webhook', {
-  configurable: true,
-  enumerable: true,
-  get() {
-    if (lazyWebhook === undefined) {
-      const { Server } = require('./webhook/server');
-      const admission = require('./webhook/admission');
-
-      lazyWebhook = { admission, Server };
-    }
-
-    return lazyWebhook;
-  }
-});
