@@ -10,6 +10,7 @@ const {
 } = require('./reconcile');
 const { Source } = require('./source');
 const newControllerManagedBy = Builder.controllerManagedBy;
+let lazyWebhook;
 
 module.exports = {
   k8s,
@@ -21,3 +22,18 @@ module.exports = {
   Source,
   TerminalError
 };
+
+Object.defineProperty(module.exports, 'webhook', {
+  configurable: true,
+  enumerable: true,
+  get() {
+    if (lazyWebhook === undefined) {
+      const { Server } = require('./webhook/server');
+      const admission = require('./webhook/admission');
+
+      lazyWebhook = { admission, Server };
+    }
+
+    return lazyWebhook;
+  }
+});

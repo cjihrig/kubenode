@@ -1,3 +1,4 @@
+export const webhook: any;
 import k8s = require("@kubernetes/client-node");
 import { Manager } from "./manager";
 export const newControllerManagedBy: typeof Builder.controllerManagedBy;
