@@ -58,7 +58,9 @@ function webhook(data) {
   const dashGroup = data.group.replaceAll('.', '-');
   const path = `/${data.op}-${dashGroup}-${data.version}-${data.kind}`.toLowerCase();
 
-  return `// ATTENTION: YOU **SHOULD** EDIT THIS FILE!
+  return `import { webhook } from '@kubenode/controller-runtime';
+
+// ATTENTION: YOU **SHOULD** EDIT THIS FILE!
 
 export class ${data.className} {
   constructor() {
@@ -66,7 +68,7 @@ export class ${data.className} {
   }
 
   handler(context, request) {
-
+    return webhook.admission.allowed();
   }
 
   setupWebhookWithManager(manager) {

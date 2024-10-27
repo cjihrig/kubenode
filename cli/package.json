@@ -33,7 +33,7 @@
     "test": "test"
   },
   "dependencies": {
-    "@kubenode/controller-runtime": "^0.1.0",
+    "@kubenode/controller-runtime": "^0.1.2",
     "@kubenode/crdgen": "^0.1.0",
     "js-yaml": "^4.1.0",
     "pluralize": "^8.0.0"
