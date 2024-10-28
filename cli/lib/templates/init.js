@@ -49,6 +49,19 @@ metadata:
     app.kubernetes.io/part-of: ${data.projectName}
     app.kubernetes.io/managed-by: kubenode
 ---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: controller-manager
+  namespace: ${data.projectName}
+  labels:
+    app.kubernetes.io/name: serviceaccount
+    app.kubernetes.io/instance: controller-manager-sa
+    app.kubernetes.io/component: rbac
+    app.kubernetes.io/created-by: ${data.projectName}
+    app.kubernetes.io/part-of: ${data.projectName}
+    app.kubernetes.io/managed-by: kubenode
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -105,6 +118,34 @@ spec:
 `;
 }
 
+function managerRole(data) {
+  return `apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: ${data.projectName}-manager-role
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: ${data.projectName}-manager-rolebinding
+  labels:
+    app.kubernetes.io/name: clusterrolebinding
+    app.kubernetes.io/instance: manager-rolebinding
+    app.kubernetes.io/component: rbac
+    app.kubernetes.io/created-by: ${data.projectName}
+    app.kubernetes.io/part-of: ${data.projectName}
+    app.kubernetes.io/managed-by: kubenode
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: ${data.projectName}-manager-role
+subjects:
+- kind: ServiceAccount
+  name: controller-manager
+  namespace: ${data.projectName}
+`;
+}
+
 function packageJson(data) {
   const pkg = {
     name: data.projectName,
@@ -128,5 +169,6 @@ module.exports = {
   main,
   mainTest,
   manager,
+  managerRole,
   packageJson
 };
