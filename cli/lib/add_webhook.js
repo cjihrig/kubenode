@@ -186,9 +186,11 @@ function manifestForHook(manifests, hookKind, data) {
     manifest = {
       apiVersion: 'admissionregistration.k8s.io/v1',
       kind: hookKind,
-      metadata: { name: `${hookType}-webhook-configuration` },
-      annotations: {
-        'cert-manager.io/inject-ca-from': `${data.projectName}/serving-cert`
+      metadata: {
+        name: `${hookType}-webhook-configuration`,
+        annotations: {
+          'cert-manager.io/inject-ca-from': `${data.projectName}/serving-cert`
+        },
       },
       webhooks: []
     };
