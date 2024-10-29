@@ -54,6 +54,7 @@ export class Server {
     /**
      * start() runs the server.
      * @param {Object} ctx The context object.
+     * @returns {Promise}
      */
-    start(ctx: any): void;
+    start(ctx: any): Promise<any>;
 }

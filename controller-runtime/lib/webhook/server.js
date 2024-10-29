@@ -170,10 +170,22 @@ class Server {
   /**
    * start() runs the server.
    * @param {Object} ctx The context object.
+   * @returns {Promise}
    */
   start(ctx) {
+    // @ts-ignore
+    const { promise, resolve, reject } = Promise.withResolvers();
+
     this.context = ctx;
-    this.server.listen(this.port);
+    this.server.listen(this.port, (err) => {
+      if (err) {
+        reject(err);
+        return;
+      }
+
+      resolve();
+    });
+    return promise;
   }
 }
 

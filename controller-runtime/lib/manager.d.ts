@@ -9,6 +9,6 @@ export class Manager {
     getWebhookServer(): import("./webhook/server").Server;
     start(context?: {
         client: any;
-    }): void;
+    }): Promise<void>;
     #private;
 }

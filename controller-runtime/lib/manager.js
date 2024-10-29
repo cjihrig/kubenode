@@ -49,12 +49,17 @@ class Manager {
     return this.webhookServer;
   }
 
-  start(context = this.#defaultContext()) {
+  async start(context = this.#defaultContext()) {
     if (this.started) {
       throw new Error('manager already started');
     }
 
     this.started = true;
+
+    if (this.webhookServer !== null) {
+      await this.webhookServer.start();
+    }
+
     for (let i = 0; i < this.controllers.length; ++i) {
       this.controllers[i].start(context);
     }
