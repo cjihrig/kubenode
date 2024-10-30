@@ -4,6 +4,7 @@ const { join, resolve } = require('node:path');
 const pluralize = require('pluralize');
 const yaml = require('js-yaml');
 const { Project } = require('./project');
+const { updateManagerRole } = require('./rbac');
 const kCommand = 'webhook';
 const kDescription = 'Add a new webhook to a project';
 const flags = {
@@ -73,6 +74,8 @@ async function run(flags, positionals) {
   const serviceFile = join(webhookDir, 'service.yaml');
   const managerDir = join(projectDir, 'config', 'manager');
   const managerConfig = join(managerDir, 'manager.yaml');
+  const rbacDir = join(projectDir, 'config', 'rbac');
+  const rbacConfig = join(rbacDir, 'manager_role.yaml');
   const data = {
     group: flags.group,
     kind,
@@ -113,6 +116,7 @@ async function run(flags, positionals) {
   writeFileSync(serviceFile, templates.service(data));
   createOrUpdateManifestsFile(manifestsFile, data);
   updateManagerConfig(managerConfig, data);
+  updateManagerRole(rbacConfig, data);
 
   if (flags.validating) {
     const filename = `${kind.toLowerCase()}_validating_webhook.js`;
@@ -190,7 +194,7 @@ function manifestForHook(manifests, hookKind, data) {
         name: `${hookType}-webhook-configuration`,
         annotations: {
           'cert-manager.io/inject-ca-from': `${data.projectName}/serving-cert`
-        },
+        }
       },
       webhooks: []
     };

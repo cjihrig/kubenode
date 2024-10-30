@@ -3,6 +3,7 @@ const { mkdirSync, writeFileSync } = require('node:fs');
 const { join, resolve } = require('node:path');
 const pluralize = require('pluralize');
 const { Project } = require('./project');
+const { updateManagerRole } = require('./rbac');
 const kCommand = 'api';
 const kDescription = 'Add a new API to a project';
 const flags = {
@@ -53,6 +54,8 @@ async function run(flags, positionals) {
   const typePath = join(ctrlDir, `${singular}_types.ts`);
   const sampleDir = join(projectDir, 'config', 'samples');
   const samplePath = join(sampleDir, `${gvDirName}_${singular}.yaml`);
+  const rbacDir = join(projectDir, 'config', 'rbac');
+  const rbacConfig = join(rbacDir, 'manager_role.yaml');
   const data = {
     group: flags.group,
     kind,
@@ -80,6 +83,7 @@ async function run(flags, positionals) {
   writeFileSync(ctrl, templates.controller(data));
   writeFileSync(samplePath, templates.sample(data));
   writeFileSync(typePath, templates.types(data));
+  updateManagerRole(rbacConfig, data);
 
   {
     // Update generated code in existing files.
