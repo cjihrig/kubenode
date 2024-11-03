@@ -2,8 +2,8 @@
 const { mkdirSync, writeFileSync } = require('node:fs');
 const { join, resolve } = require('node:path');
 const pluralize = require('pluralize');
-const { Project } = require('./project');
-const { updateManagerRole } = require('./rbac');
+const { Project } = require('../project');
+const { updateManagerRole } = require('../rbac');
 const kCommand = 'api';
 const kDescription = 'Add a new API to a project';
 const flags = {
@@ -101,7 +101,7 @@ async function run(flags, positionals) {
 }
 
 function lazyLoadTemplates() {
-  templates = require('./templates/add_api');
+  templates = require('../templates/add_api');
 }
 
 module.exports = {

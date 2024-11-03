@@ -1,7 +1,7 @@
 'use strict';
 const { mkdirSync, writeFileSync } = require('node:fs');
 const { basename, join, resolve } = require('node:path');
-const { Project } = require('./project');
+const { Project } = require('../project');
 const kCommand = 'init';
 const kDescription = 'Initialize a new project';
 const kProjectVersion = '0';
@@ -66,7 +66,7 @@ async function run(flags, positionals) {
 }
 
 function lazyLoadTemplates() {
-  templates = require('./templates/init');
+  templates = require('../templates/init');
 }
 
 module.exports = {

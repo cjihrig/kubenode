@@ -3,8 +3,8 @@ const { mkdirSync, readFileSync, writeFileSync } = require('node:fs');
 const { join, resolve } = require('node:path');
 const pluralize = require('pluralize');
 const yaml = require('js-yaml');
-const { Project } = require('./project');
-const { updateManagerRole } = require('./rbac');
+const { Project } = require('../project');
+const { updateManagerRole } = require('../rbac');
 const kCommand = 'webhook';
 const kDescription = 'Add a new webhook to a project';
 const flags = {
@@ -161,7 +161,7 @@ async function run(flags, positionals) {
 }
 
 function lazyLoadTemplates() {
-  templates = require('./templates/add_webhook');
+  templates = require('../templates/add_webhook');
 }
 
 function updateKustomizationFile(filename) {
