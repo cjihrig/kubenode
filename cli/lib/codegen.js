@@ -46,6 +46,7 @@ async function run(flags, positionals) {
   const typePath = join(ctrlDir, `${flags.kind.toLowerCase()}_types.ts`);
   const crdDir = join(projectDir, 'config', 'crd');
   const crdKustomizationFile = join(crdDir, 'kustomization.yaml');
+  const kustomizationFile = join(projectDir, 'config', 'kustomization.yaml');
   const models = crdgen.generateModelsFromFiles([typePath]);
   const crdYamlFiles = [];
 
@@ -61,10 +62,28 @@ async function run(flags, positionals) {
     crdYamlFiles.push(filename);
   }
 
-  createOrUpdateKustomizationFile(crdKustomizationFile, crdYamlFiles);
+  createOrUpdateCRDKustomizationFile(crdKustomizationFile, crdYamlFiles);
+  updateKustomizationFile(kustomizationFile);
 }
 
-function createOrUpdateKustomizationFile(filename, crdFiles) {
+function updateKustomizationFile(filename) {
+  const yamlData = readFileSync(filename, 'utf8');
+  const body = yaml.load(yamlData, { filename });
+
+  // @ts-ignore
+  body.resources ??= [];
+  // @ts-ignore
+  const resources = body.resources;
+
+  if (resources.includes('crd')) {
+    return;
+  }
+
+  resources.splice(resources.indexOf('rbac'), 0, 'crd');
+  writeFileSync(filename, yaml.dump(body));
+}
+
+function createOrUpdateCRDKustomizationFile(filename, crdFiles) {
   let body;
 
   try {

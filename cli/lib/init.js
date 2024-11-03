@@ -40,6 +40,7 @@ async function run(flags, positionals) {
   const rbacDir = join(projectDir, 'config', 'rbac');
   const rbacConfig = join(rbacDir, 'manager_role.yaml');
   const rbacKustomization = join(rbacDir, 'kustomization.yaml');
+  const kustomizationFile = join(projectDir, 'config', 'kustomization.yaml');
   const data = {
     domain: flags.domain,
     projectName: flags['project-name'],
@@ -60,6 +61,7 @@ async function run(flags, positionals) {
   writeFileSync(managerKustomization, templates.managerKustomization(data));
   writeFileSync(rbacConfig, templates.managerRole(data));
   writeFileSync(rbacKustomization, templates.rbacKustomization(data));
+  writeFileSync(kustomizationFile, templates.kustomization(data));
   project.write();
 }
 

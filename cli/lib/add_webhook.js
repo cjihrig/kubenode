@@ -78,6 +78,7 @@ async function run(flags, positionals) {
   const managerConfig = join(managerDir, 'manager.yaml');
   const rbacDir = join(projectDir, 'config', 'rbac');
   const rbacConfig = join(rbacDir, 'manager_role.yaml');
+  const kustomizationFile = join(projectDir, 'config', 'kustomization.yaml');
   const data = {
     group: flags.group,
     kind,
@@ -154,12 +155,41 @@ async function run(flags, positionals) {
     writeFileSync(webhookSrcFile, templates.webhook(templateData));
   }
 
+  updateKustomizationFile(kustomizationFile);
   await project.writeMarkers();
   project.write();
 }
 
 function lazyLoadTemplates() {
   templates = require('./templates/add_webhook');
+}
+
+function updateKustomizationFile(filename) {
+  const yamlData = readFileSync(filename, 'utf8');
+  const body = yaml.load(yamlData, { filename });
+
+  // @ts-ignore
+  body.resources ??= [];
+  // @ts-ignore
+  const resources = body.resources;
+  let index = resources.indexOf('manager') + 1;
+  let updated = false;
+
+  if (!resources.includes('certmanager')) {
+    resources.splice(index, 0, 'certmanager');
+    updated = true;
+    index++;
+  }
+
+  if (!resources.includes('webhook')) {
+    resources.splice(index, 0, 'webhook');
+    updated = true;
+    index++;
+  }
+
+  if (updated) {
+    writeFileSync(filename, yaml.dump(body));
+  }
 }
 
 function createOrUpdateManifestsFile(filename, data) {

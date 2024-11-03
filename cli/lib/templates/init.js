@@ -13,6 +13,15 @@ CMD ["node", "lib/index.js"]
 `;
 }
 
+function kustomization(data) {
+  return `apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+- manager
+- rbac
+`;
+}
+
 function main(data) {
   return `import { Manager } from '@kubenode/controller-runtime';
 // @kubenode:scaffold:imports
@@ -190,6 +199,7 @@ resources:
 
 module.exports = {
   dockerfile,
+  kustomization,
   main,
   mainTest,
   manager,
