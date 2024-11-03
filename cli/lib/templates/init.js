@@ -165,6 +165,10 @@ function packageJson(data) {
     description: '',
     type: 'module',
     scripts: {
+      deploy: 'kubectl kustomize config | kubectl apply -f -',
+      undeploy: 'kubectl kustomize config | kubectl delete --ignore-not-found -f -',
+      'docker-build': 'docker build . -t controller',
+      'docker-push': 'docker push controller',
       start: 'node lib/index.js',
       test: 'node --test'
     },
