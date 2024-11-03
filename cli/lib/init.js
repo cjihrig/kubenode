@@ -36,6 +36,7 @@ async function run(flags, positionals) {
   const mainTest = join(srcDir, 'index.test.js');
   const managerDir = join(projectDir, 'config', 'manager');
   const managerConfig = join(managerDir, 'manager.yaml');
+  const managerKustomization = join(managerDir, 'kustomization.yaml');
   const rbacDir = join(projectDir, 'config', 'rbac');
   const rbacConfig = join(rbacDir, 'manager_role.yaml');
   const data = {
@@ -55,6 +56,7 @@ async function run(flags, positionals) {
   writeFileSync(main, templates.main(data));
   writeFileSync(mainTest, templates.mainTest(data));
   writeFileSync(managerConfig, templates.manager(data));
+  writeFileSync(managerKustomization, templates.managerKustomization(data));
   writeFileSync(rbacConfig, templates.managerRole(data));
   project.write();
 }

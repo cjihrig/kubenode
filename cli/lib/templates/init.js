@@ -118,6 +118,18 @@ spec:
 `;
 }
 
+function managerKustomization(data) {
+  return `apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+- manager.yaml
+images:
+- name: controller
+  newName: controller
+  newTag: latest
+`;
+}
+
 function managerRole(data) {
   return `apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
@@ -169,6 +181,7 @@ module.exports = {
   main,
   mainTest,
   manager,
+  managerKustomization,
   managerRole,
   packageJson
 };
