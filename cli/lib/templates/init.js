@@ -176,6 +176,14 @@ function packageJson(data) {
   return JSON.stringify(pkg, null, 2);
 }
 
+function rbacKustomization(data) {
+  return `apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+- manager_role.yaml
+`;
+}
+
 module.exports = {
   dockerfile,
   main,
@@ -183,5 +191,6 @@ module.exports = {
   manager,
   managerKustomization,
   managerRole,
-  packageJson
+  packageJson,
+  rbacKustomization
 };
