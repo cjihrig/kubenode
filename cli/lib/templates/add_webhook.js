@@ -35,6 +35,14 @@ spec:
 `;
 }
 
+function certManagerKustomization(data) {
+  return `apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+- certificate.yaml
+`;
+}
+
 function service(data) {
   return `apiVersion: v1
 kind: Service
@@ -80,8 +88,19 @@ export class ${data.className} {
 `;
 }
 
+function webhookKustomization(data) {
+  return `apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+- service.yaml
+- manifests.yaml
+`;
+}
+
 module.exports = {
   certificate,
+  certManagerKustomization,
   service,
-  webhook
+  webhook,
+  webhookKustomization
 };

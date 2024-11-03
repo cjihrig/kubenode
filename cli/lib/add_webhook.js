@@ -69,9 +69,11 @@ async function run(flags, positionals) {
   const webhookSrcDir = join(srcDir, 'webhook', gvDirName);
   const certManagerDir = join(projectDir, 'config', 'certmanager');
   const certManagerFile = join(certManagerDir, 'certificate.yaml');
+  const certManagerKustomization = join(certManagerDir, 'kustomization.yaml');
   const webhookDir = join(projectDir, 'config', 'webhook');
   const manifestsFile = join(webhookDir, 'manifests.yaml');
   const serviceFile = join(webhookDir, 'service.yaml');
+  const webhookKustomization = join(webhookDir, 'kustomization.yaml');
   const managerDir = join(projectDir, 'config', 'manager');
   const managerConfig = join(managerDir, 'manager.yaml');
   const rbacDir = join(projectDir, 'config', 'rbac');
@@ -113,6 +115,12 @@ async function run(flags, positionals) {
   mkdirSync(certManagerDir, { recursive: true });
   mkdirSync(webhookDir, { recursive: true });
   writeFileSync(certManagerFile, templates.certificate(data));
+  writeFileSync(
+    certManagerKustomization, templates.certManagerKustomization(data)
+  );
+  writeFileSync(
+    webhookKustomization, templates.webhookKustomization(data)
+  );
   writeFileSync(serviceFile, templates.service(data));
   createOrUpdateManifestsFile(manifestsFile, data);
   updateManagerConfig(managerConfig, data);
