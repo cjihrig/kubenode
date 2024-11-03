@@ -1,5 +1,5 @@
 'use strict';
-const { mkdirSync, writeFileSync } = require('node:fs');
+const { mkdirSync, readFileSync, writeFileSync } = require('node:fs');
 const { join, resolve } = require('node:path');
 const crdgen = require('@kubenode/crdgen');
 const yaml = require('js-yaml');
@@ -45,17 +45,52 @@ async function run(flags, positionals) {
   const ctrlDir = join(projectDir, 'lib', 'controller', gvDirName);
   const typePath = join(ctrlDir, `${flags.kind.toLowerCase()}_types.ts`);
   const crdDir = join(projectDir, 'config', 'crd');
+  const crdKustomizationFile = join(crdDir, 'kustomization.yaml');
   const models = crdgen.generateModelsFromFiles([typePath]);
+  const crdYamlFiles = [];
 
   mkdirSync(crdDir, { recursive: true });
 
   for (const [kind, model] of models) {
-    const filename = join(crdDir, `${gvDirName}_${kind.toLowerCase()}.yaml`);
+    const filename = `${gvDirName}_${kind.toLowerCase()}.yaml`;
+    const fullname = join(crdDir, filename);
     const crd = model.toCRD();
     const crdYaml = yaml.dump(crd);
 
-    writeFileSync(filename, crdYaml);
+    writeFileSync(fullname, crdYaml);
+    crdYamlFiles.push(filename);
   }
+
+  createOrUpdateKustomizationFile(crdKustomizationFile, crdYamlFiles);
+}
+
+function createOrUpdateKustomizationFile(filename, crdFiles) {
+  let body;
+
+  try {
+    const yamlData = readFileSync(filename, 'utf8');
+    body = yaml.load(yamlData, { filename });
+  } catch (err) {
+    body = {
+      apiVersion: 'kustomize.config.k8s.io/v1beta1',
+      kind: 'Kustomization'
+    };
+  }
+
+  // @ts-ignore
+  body.resources ??= [];
+
+  for (let i = 0; i < crdFiles.length; ++i) {
+    const file = crdFiles[i];
+
+    // @ts-ignore
+    if (!body.resources.includes(file)) {
+      // @ts-ignore
+      body.resources.push(file);
+    }
+  }
+
+  writeFileSync(filename, yaml.dump(body));
 }
 
 module.exports = {
