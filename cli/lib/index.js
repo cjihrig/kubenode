@@ -6,11 +6,13 @@ const rootCommand = {
   subcommands() {
     const add = require('./commands/add');
     const codegen = require('./commands/codegen');
+    const configure = require('./commands/configure');
     const init = require('./commands/init');
     // @ts-ignore
     const commands = new Map([
       [add.command, add],
       [codegen.command, codegen],
+      [configure.command, configure],
       [init.command, init]
     ]);
 

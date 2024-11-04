@@ -35,6 +35,7 @@
   "dependencies": {
     "@kubenode/controller-runtime": "^0.1.3",
     "@kubenode/crdgen": "^0.1.0",
+    "@kubenode/reference": "^0.1.0",
     "js-yaml": "^4.1.0",
     "pluralize": "^8.0.0"
   }

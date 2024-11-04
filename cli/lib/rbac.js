@@ -4,7 +4,6 @@ const { isDeepStrictEqual } = require('node:util');
 const pluralize = require('pluralize');
 const yaml = require('js-yaml');
 
-// TODO(cjihrig): This needs to be common code for 'add webhook' and 'add api'
 function updateManagerRole(filename, data) {
   const yamlData = readFileSync(filename, 'utf8');
   const body = yaml.loadAll(yamlData, null, { filename });
