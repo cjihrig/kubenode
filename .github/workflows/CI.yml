@@ -35,3 +35,7 @@ jobs:
       run: cd crdgen && npm install && npm test
       env:
         CI: true
+    - name: reference CI
+      run: cd reference && npm install && npm test
+      env:
+        CI: true
