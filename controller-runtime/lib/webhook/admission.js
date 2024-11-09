@@ -50,7 +50,7 @@ class AdmissionRequest {
    */
   constructor(options) {
     if (options === null || typeof options !== 'object') {
-      throw new Error('options must be an object or boolean');
+      throw new TypeError('options must be an object or boolean');
     }
 
     const {
@@ -162,7 +162,7 @@ class AdmissionReview {
    */
   constructor(options) {
     if (options === null || typeof options !== 'object') {
-      throw new Error('options must be an object or boolean');
+      throw new TypeError('options must be an object or boolean');
     }
 
     const {
