@@ -11,21 +11,16 @@ const kConfigFile = 'kubenode.json';
 const kMarkerRegEx = /^\s*\/\/\s*(@kubenode:.+)\s*$/;
 
 class Project {
-  constructor(data = {}) {
+  constructor(data) {
     if (data === null || typeof data !== 'object') {
       throw new Error('project data must be an object');
     }
 
     const {
-      // @ts-ignore
       domain,
-      // @ts-ignore
       projectName,
-      // @ts-ignore
       projectPath,
-      // @ts-ignore
       version,
-      // @ts-ignore
       resources = []
     } = data;
 
