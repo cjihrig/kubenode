@@ -9,7 +9,7 @@
     "lint": "belly-button -f",
     "pretest": "npm run lint && tsc --noEmit",
     "test": "node --test --experimental-test-coverage",
-    "types": "rm lib/*.d.ts && tsc"
+    "types": "rm -f lib/*.d.ts && tsc"
   },
   "devDependencies": {
     "belly-button": "^8.0.0",

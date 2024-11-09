@@ -46,19 +46,37 @@ function optional(...strings) {
   return '(?:' + strings.join('') + ')?';
 }
 
-function parse(string) {
-  if (typeof string !== 'string') {
+/**
+ * @typedef {Object} NamedRepository
+ * @property {string} [domain] The repository host and port information.
+ * @property {string} [path] The image path.
+ */
+
+/**
+ * @typedef {Object} Reference
+ * @property {NamedRepository} namedRepository Object holding the image host, port, and path information.
+ * @property {string} [tag] The image tag if one exists.
+ * @property {string} [digest] The image digest if one exists.
+ */
+
+/**
+ * parse() splits an image reference into its various components.
+ * @param {string} input The image reference string to parse.
+ * @returns {Reference}
+ */
+function parse(input) {
+  if (typeof input !== 'string') {
     throw new TypeError('input must be a string');
   }
 
-  const match = referenceRegEx.exec(string);
+  const match = referenceRegEx.exec(input);
 
   if (match === null) {
-    if (string === '') {
+    if (input === '') {
       throw new Error('repository name must have at least one component');
     }
 
-    if (referenceRegEx.test(string.toLowerCase())) {
+    if (referenceRegEx.test(input.toLowerCase())) {
       throw new Error('repository name must be lowercase');
     }
 
