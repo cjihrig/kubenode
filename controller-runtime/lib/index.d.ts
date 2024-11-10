@@ -6,9 +6,51 @@ import { Request } from "./reconcile";
 import { Result } from "./reconcile";
 import { Source } from "./source";
 import { TerminalError } from "./reconcile";
-export namespace webhook {
-    const Server: import("./webhook/server").Server;
-    const admission: {
+import { Server } from "./webhook/server";
+import { Builder } from "./builder";
+export declare namespace apimachinery {
+    let errors: typeof import("./apimachinery/errors");
+    namespace meta {
+        let v1: {
+            StatusReasonUnknown: string;
+            StatusReasonUnauthorized: string;
+            StatusReasonForbidden: string;
+            StatusReasonNotFound: string;
+            StatusReasonAlreadyExists: string;
+            StatusReasonConflict: string;
+            StatusReasonGone: string;
+            StatusReasonInvalid: string;
+            StatusReasonServerTimeout: string;
+            StatusReasonTimeout: string;
+            StatusReasonTooManyRequests: string;
+            StatusReasonBadRequest: string;
+            StatusReasonMethodNotAllowed: string;
+            StatusReasonNotAcceptable: string;
+            StatusReasonRequestEntityTooLarge: string;
+            StatusReasonUnsupportedMediaType: string;
+            StatusReasonInternalError: string;
+            StatusReasonExpired: string;
+            StatusReasonServiceUnavailable: string;
+        };
+    }
+    let types: {
+        NamespacedName: {
+            new (name: string, namespace?: string): {
+                name: string;
+                namespace: string;
+                toString(): string;
+            };
+        };
+        separator: string;
+        JSONPatchType: string;
+        MergePatchType: string;
+        StrategicMergePatchType: string;
+        ApplyPatchType: string;
+    };
+}
+export declare let controllerutil: typeof import("./controllerutil");
+export declare namespace webhook {
+    export let admission: {
         AdmissionReview: {
             new (options: import("./webhook/admission").AdmissionReviewOptions): {
                 apiVersion: string;
@@ -222,6 +264,6 @@ export namespace webhook {
             }): void;
         };
     };
+    export { Server };
 }
-import { Builder } from "./builder";
 export { k8s, Manager, Reconciler, Request, Result, Source, TerminalError };
