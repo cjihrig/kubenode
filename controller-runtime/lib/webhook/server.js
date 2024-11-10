@@ -61,7 +61,7 @@ class Server {
     }
 
     if (typeof insecure !== 'boolean') {
-      throw new TypeError('options.insecure must be a string');
+      throw new TypeError('options.insecure must be a boolean');
     }
 
     if (typeof keyName !== 'string') {
@@ -102,8 +102,7 @@ class Server {
       ({ Readable } = require('node:stream'));
     }
 
-    // @ts-ignore
-    const { promise, resolve } = Promise.withResolvers();
+    const { promise, resolve } = withResolvers();
     const response = {
       body: undefined,
       headers: {},
@@ -173,8 +172,7 @@ class Server {
    * @returns {Promise}
    */
   start(ctx) {
-    // @ts-ignore
-    const { promise, resolve, reject } = Promise.withResolvers();
+    const { promise, resolve, reject } = withResolvers();
 
     this.context = ctx;
     this.server.listen(this.port, (err) => {
@@ -235,8 +233,7 @@ function writeAdmissionResponse(res, response) {
 }
 
 function readAdmissionReview(req) {
-  // @ts-ignore
-  const { promise, resolve, reject } = Promise.withResolvers();
+  const { promise, resolve, reject } = withResolvers();
   let body = '';
 
   req.setEncoding('utf8');
@@ -261,6 +258,27 @@ function readAdmissionReview(req) {
   });
 
   return promise;
+}
+
+/**
+ * @typedef {Object} PromiseWithResolvers
+ * @property {Promise} promise
+ * @property {Function} resolve
+ * @property {Function} reject
+ */
+
+/**
+ * withResolvers() works like Promise.withResolvers().
+ * @returns {PromiseWithResolvers}
+ */
+function withResolvers() {
+  let resolve;
+  let reject;
+  const promise = new Promise((res, rej) => {
+    resolve = res;
+    reject = rej;
+  });
+  return { promise, resolve, reject };
 }
 
 module.exports = { Server };

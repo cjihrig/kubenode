@@ -1,3 +1,8 @@
+export type PromiseWithResolvers = {
+    promise: Promise<any>;
+    resolve: Function;
+    reject: Function;
+};
 export type ServerOptions = {
     /**
      * The directory that contains the server key and certificate.
