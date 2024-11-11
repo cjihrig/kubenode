@@ -1,14 +1,5 @@
 import k8s = require("@kubernetes/client-node");
-import { Manager } from "./manager";
-export const newControllerManagedBy: typeof Builder.controllerManagedBy;
-import { Reconciler } from "./reconcile";
-import { Request } from "./reconcile";
-import { Result } from "./reconcile";
-import { Source } from "./source";
-import { TerminalError } from "./reconcile";
-import { Server } from "./webhook/server";
-import { Builder } from "./builder";
-export declare namespace apimachinery {
+export namespace apimachinery {
     let errors: typeof import("./apimachinery/errors");
     namespace meta {
         let v1: {
@@ -48,8 +39,15 @@ export declare namespace apimachinery {
         ApplyPatchType: string;
     };
 }
-export declare let controllerutil: typeof import("./controllerutil");
-export declare namespace webhook {
+import controllerutil = require("./controllerutil");
+import { Manager } from "./manager";
+export const newControllerManagedBy: typeof Builder.controllerManagedBy;
+import { Reconciler } from "./reconcile";
+import { Request } from "./reconcile";
+import { Result } from "./reconcile";
+import { Source } from "./source";
+import { TerminalError } from "./reconcile";
+export namespace webhook {
     export let admission: {
         AdmissionReview: {
             new (options: import("./webhook/admission").AdmissionReviewOptions): {
@@ -266,4 +264,6 @@ export declare namespace webhook {
     };
     export { Server };
 }
-export { k8s, Manager, Reconciler, Request, Result, Source, TerminalError };
+import { Builder } from "./builder";
+import { Server } from "./webhook/server";
+export { defaultExport as default, k8s, controllerutil, Manager, Reconciler, Request, Result, Source, TerminalError };
