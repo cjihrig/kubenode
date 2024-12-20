@@ -1,5 +1,5 @@
-'use strict';
-const metav1 = require('./meta/v1');
+import metav1 from './meta/v1.js';
+
 const knownReasons = new Set([
   metav1.StatusReasonUnauthorized,
   metav1.StatusReasonForbidden,
@@ -31,7 +31,7 @@ const knownReasons = new Set([
  * @param {Error} err
  * @returns {string} A StatusReason representing the cause of the error.
  */
-function reasonForError(err) {
+export function reasonForError(err) {
   // @ts-ignore
   const reason = err?.body?.reason;
 
@@ -44,7 +44,7 @@ function reasonForError(err) {
  * @returns {[string, number]} An array containing the reason and code of the
  * error.
  */
-function reasonAndCodeForError(err) {
+export function reasonAndCodeForError(err) {
   // @ts-ignore
   const reason = err?.body?.reason;
   // @ts-ignore
@@ -58,7 +58,7 @@ function reasonAndCodeForError(err) {
  * @param {Error} err
  * @returns {boolean}
  */
-function isAlreadyExists(err) {
+export function isAlreadyExists(err) {
   return reasonForError(err) === metav1.StatusReasonAlreadyExists;
 }
 
@@ -68,7 +68,7 @@ function isAlreadyExists(err) {
  * @param {Error} err
  * @returns {boolean}
  */
-function isBadRequest(err) {
+export function isBadRequest(err) {
   const [reason, code] = reasonAndCodeForError(err);
 
   return reason === metav1.StatusReasonBadRequest ||
@@ -81,7 +81,7 @@ function isBadRequest(err) {
  * @param {Error} err
  * @returns {boolean}
  */
-function isConflict(err) {
+export function isConflict(err) {
   const [reason, code] = reasonAndCodeForError(err);
 
   return reason === metav1.StatusReasonConflict ||
@@ -94,7 +94,7 @@ function isConflict(err) {
  * @param {Error} err
  * @returns {boolean}
  */
-function isForbidden(err) {
+export function isForbidden(err) {
   const [reason, code] = reasonAndCodeForError(err);
 
   return reason === metav1.StatusReasonForbidden ||
@@ -107,7 +107,7 @@ function isForbidden(err) {
  * @param {Error} err
  * @returns {boolean}
  */
-function isGone(err) {
+export function isGone(err) {
   const [reason, code] = reasonAndCodeForError(err);
 
   return reason === metav1.StatusReasonGone ||
@@ -120,7 +120,7 @@ function isGone(err) {
  * @param {Error} err
  * @returns {boolean}
  */
-function isInternalError(err) {
+export function isInternalError(err) {
   const [reason, code] = reasonAndCodeForError(err);
 
   return reason === metav1.StatusReasonInternalError ||
@@ -133,7 +133,7 @@ function isInternalError(err) {
  * @param {Error} err
  * @returns {boolean}
  */
-function isInvalid(err) {
+export function isInvalid(err) {
   const [reason, code] = reasonAndCodeForError(err);
 
   return reason === metav1.StatusReasonInvalid ||
@@ -147,7 +147,7 @@ function isInvalid(err) {
  * @param {Error} err
  * @returns {boolean}
  */
-function isMethodNotSupported(err) {
+export function isMethodNotSupported(err) {
   const [reason, code] = reasonAndCodeForError(err);
 
   return reason === metav1.StatusReasonMethodNotAllowed ||
@@ -160,7 +160,7 @@ function isMethodNotSupported(err) {
  * @param {Error} err
  * @returns {boolean}
  */
-function isNotAcceptable(err) {
+export function isNotAcceptable(err) {
   const [reason, code] = reasonAndCodeForError(err);
 
   return reason === metav1.StatusReasonNotAcceptable ||
@@ -173,7 +173,7 @@ function isNotAcceptable(err) {
  * @param {Error} err
  * @returns {boolean}
  */
-function isNotFound(err) {
+export function isNotFound(err) {
   const [reason, code] = reasonAndCodeForError(err);
 
   return reason === metav1.StatusReasonNotFound ||
@@ -186,7 +186,7 @@ function isNotFound(err) {
  * @param {Error} err
  * @returns {boolean}
  */
-function isRequestEntityTooLargeError(err) {
+export function isRequestEntityTooLargeError(err) {
   const [reason, code] = reasonAndCodeForError(err);
 
   return reason === metav1.StatusReasonRequestEntityTooLarge || code === 413;
@@ -198,7 +198,7 @@ function isRequestEntityTooLargeError(err) {
  * @param {Error} err
  * @returns {boolean}
  */
-function isResourceExpired(err) {
+export function isResourceExpired(err) {
   return reasonForError(err) === metav1.StatusReasonExpired;
 }
 
@@ -208,7 +208,7 @@ function isResourceExpired(err) {
  * @param {Error} err
  * @returns {boolean}
  */
-function isServerTimeout(err) {
+export function isServerTimeout(err) {
   return reasonForError(err) === metav1.StatusReasonServerTimeout;
 }
 
@@ -218,7 +218,7 @@ function isServerTimeout(err) {
  * @param {Error} err
  * @returns {boolean}
  */
-function isServiceUnavailable(err) {
+export function isServiceUnavailable(err) {
   const [reason, code] = reasonAndCodeForError(err);
 
   return reason === metav1.StatusReasonServiceUnavailable ||
@@ -231,7 +231,7 @@ function isServiceUnavailable(err) {
  * @param {Error} err
  * @returns {boolean}
  */
-function isTimeout(err) {
+export function isTimeout(err) {
   const [reason, code] = reasonAndCodeForError(err);
 
   return reason === metav1.StatusReasonTimeout ||
@@ -244,7 +244,7 @@ function isTimeout(err) {
  * @param {Error} err
  * @returns {boolean}
  */
-function isTooManyRequests(err) {
+export function isTooManyRequests(err) {
   const [reason, code] = reasonAndCodeForError(err);
 
   return reason === metav1.StatusReasonTooManyRequests || code === 429;
@@ -256,7 +256,7 @@ function isTooManyRequests(err) {
  * @param {Error} err
  * @returns {boolean}
  */
-function isUnauthorized(err) {
+export function isUnauthorized(err) {
   const [reason, code] = reasonAndCodeForError(err);
 
   return reason === metav1.StatusReasonUnauthorized ||
@@ -269,14 +269,14 @@ function isUnauthorized(err) {
  * @param {Error} err
  * @returns {boolean}
  */
-function isUnsupportedMediaType(err) {
+export function isUnsupportedMediaType(err) {
   const [reason, code] = reasonAndCodeForError(err);
 
   return reason === metav1.StatusReasonUnsupportedMediaType ||
     (code === 415 && !knownReasons.has(reason));
 }
 
-module.exports = {
+export default {
   isAlreadyExists,
   isBadRequest,
   isConflict,

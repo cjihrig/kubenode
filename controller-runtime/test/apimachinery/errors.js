@@ -1,8 +1,7 @@
-'use strict';
-const assert = require('node:assert');
-const { test } = require('node:test');
-const errors = require('../../lib/apimachinery/errors');
-const metav1 = require('../../lib/apimachinery/meta/v1');
+import assert from 'node:assert';
+import { test } from 'node:test';
+import errors from '../../lib/apimachinery/errors.js';
+import metav1 from '../../lib/apimachinery/meta/v1.js';
 
 test('reasonForError() with a known reason', () => {
   const err = { body: { reason: metav1.StatusReasonNotFound } };

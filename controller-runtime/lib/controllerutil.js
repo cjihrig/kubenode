@@ -1,6 +1,4 @@
-'use strict';
-
-function addFinalizer(o, finalizer) {
+export function addFinalizer(o, finalizer) {
   if (containsFinalizer(o, finalizer)) {
     return false;
   }
@@ -10,7 +8,7 @@ function addFinalizer(o, finalizer) {
   return true;
 }
 
-function containsFinalizer(o, finalizer) {
+export function containsFinalizer(o, finalizer) {
   if (!Array.isArray(o.body.metadata.finalizers)) {
     return false;
   }
@@ -18,7 +16,7 @@ function containsFinalizer(o, finalizer) {
   return o.body.metadata.finalizers.indexOf(finalizer) !== -1;
 }
 
-function removeFinalizer(o, finalizer) {
+export function removeFinalizer(o, finalizer) {
   if (!Array.isArray(o.body.metadata.finalizers)) {
     return false;
   }
@@ -33,7 +31,7 @@ function removeFinalizer(o, finalizer) {
   return true;
 }
 
-module.exports = {
+export default {
   addFinalizer,
   containsFinalizer,
   removeFinalizer

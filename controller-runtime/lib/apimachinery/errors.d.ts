@@ -1,4 +1,17 @@
 /**
+ * reasonForError() returns the reason for a particular error.
+ * @param {Error} err
+ * @returns {string} A StatusReason representing the cause of the error.
+ */
+export function reasonForError(err: Error): string;
+/**
+ * reasonAndCodeForError() returns the reason and code for a particular error.
+ * @param {Error} err
+ * @returns {[string, number]} An array containing the reason and code of the
+ * error.
+ */
+export function reasonAndCodeForError(err: Error): [string, number];
+/**
  * isAlreadyExists() determines if the err is an error which indicates that a
  * specified resource already exists.
  * @param {Error} err
@@ -125,9 +138,25 @@ export function isUnauthorized(err: Error): boolean;
  * @returns {boolean}
  */
 export function isUnsupportedMediaType(err: Error): boolean;
-/**
- * reasonForError() returns the reason for a particular error.
- * @param {Error} err
- * @returns {string} A StatusReason representing the cause of the error.
- */
-export function reasonForError(err: Error): string;
+declare namespace _default {
+    export { isAlreadyExists };
+    export { isBadRequest };
+    export { isConflict };
+    export { isForbidden };
+    export { isGone };
+    export { isInternalError };
+    export { isInvalid };
+    export { isMethodNotSupported };
+    export { isNotAcceptable };
+    export { isNotFound };
+    export { isRequestEntityTooLargeError };
+    export { isResourceExpired };
+    export { isServerTimeout };
+    export { isServiceUnavailable };
+    export { isTimeout };
+    export { isTooManyRequests };
+    export { isUnauthorized };
+    export { isUnsupportedMediaType };
+    export { reasonForError };
+}
+export default _default;

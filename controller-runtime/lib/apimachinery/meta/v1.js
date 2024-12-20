@@ -1,6 +1,4 @@
-'use strict';
-
-module.exports = {
+export default {
   /**
    * StatusReasonUnknown means the server has declined to indicate a specific
    * reason. The details field may contain other information about this error.

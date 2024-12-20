@@ -6,4 +6,8 @@ export class Queue extends EventEmitter<[never]> {
         data: any;
     };
 }
-import { EventEmitter } from "events";
+declare namespace _default {
+    export { Queue };
+}
+export default _default;
+import { EventEmitter } from 'node:events';

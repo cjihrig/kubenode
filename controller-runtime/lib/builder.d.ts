@@ -16,4 +16,8 @@ export class Builder {
     watches(): this;
     #private;
 }
-import { Controller } from "./controller";
+declare namespace _default {
+    export { Builder };
+}
+export default _default;
+import { Controller } from './controller.js';

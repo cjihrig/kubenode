@@ -1,14 +1,15 @@
-'use strict';
-const { readFileSync } = require('node:fs');
-const { createServer } = require('node:http');
-const { createServer: createSecureServer } = require('node:https');
-const { tmpdir } = require('node:os');
-const { join } = require('node:path');
-const {
+import { readFileSync } from 'node:fs';
+import { createServer } from 'node:http';
+import { Readable } from 'node:stream';
+import { createServer as createSecureServer } from 'node:https';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
+import {
   AdmissionResponse,
   AdmissionReview,
   errored
-} = require('./admission');
+} from './admission.js';
+
 const kContentTypeHeader = 'content-type';
 const kContentTypeValue = 'application/json';
 const kDefaultCertName = 'tls.crt';
@@ -19,7 +20,6 @@ const kDefaultPort = 9443;
 const kMaxRequestSize = 7 * 1024 * 1024;
 const kMaxRequestTimeout = 10_000;  // 10 seconds is the Kubernetes default.
 const kResponseHeaders = { [kContentTypeHeader]: kContentTypeValue };
-let Readable;
 
 /**
  * @typedef {Object} ServerOptions
@@ -30,7 +30,7 @@ let Readable;
  * @property {number} [port] The port number that the server will bind to.
  */
 
-class Server {
+export class Server {
   /**
    * Creates a new Server instance.
    * @param {ServerOptions} [options] Options used to construct instance.
@@ -98,10 +98,6 @@ class Server {
    * @returns {Promise}
    */
   inject(settings) {
-    if (Readable === undefined) {
-      ({ Readable } = require('node:stream'));
-    }
-
     const { promise, resolve } = withResolvers();
     const response = {
       body: undefined,
@@ -281,4 +277,4 @@ function withResolvers() {
   return { promise, resolve, reject };
 }
 
-module.exports = { Server };
+export default { Server };

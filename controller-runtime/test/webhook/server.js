@@ -1,8 +1,7 @@
-'use strict';
-const assert = require('node:assert');
-const { test } = require('node:test');
-const admission = require('../../lib/webhook/admission');
-const { Server } = require('../../lib/webhook/server');
+import assert from 'node:assert';
+import { test } from 'node:test';
+import admission from '../../lib/webhook/admission.js';
+import { Server } from '../../lib/webhook/server.js';
 
 test('Server() constructor options validation', () => {
   assert.throws(() => {

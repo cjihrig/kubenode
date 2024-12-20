@@ -4,11 +4,16 @@ export class Manager {
     controllers: any[];
     kubeconfig: any;
     started: boolean;
-    webhookServer: import("./webhook/server").Server;
+    webhookServer: Server;
     add(controller: any): void;
-    getWebhookServer(): import("./webhook/server").Server;
+    getWebhookServer(): Server;
     start(context?: {
         client: any;
     }): Promise<void>;
     #private;
 }
+declare namespace _default {
+    export { Manager };
+}
+export default _default;
+import { Server } from './webhook/server.js';

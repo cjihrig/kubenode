@@ -1,7 +1,7 @@
-'use strict';
-const k8s = require('@kubernetes/client-node');
+import * as k8s from '@kubernetes/client-node';
+import { Server } from './webhook/server.js';
 
-class Manager {
+export class Manager {
   constructor(options = {}) {
     if (options === null || typeof options !== 'object') {
       throw new Error('options must be an object');
@@ -42,7 +42,6 @@ class Manager {
 
   getWebhookServer() {
     if (this.webhookServer === null) {
-      const { Server } = require('./webhook/server');
       this.webhookServer = new Server();
     }
 
@@ -70,4 +69,4 @@ class Manager {
   }
 }
 
-module.exports = { Manager };
+export default { Manager };

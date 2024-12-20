@@ -1,9 +1,8 @@
-'use strict';
-const { randomUUID } = require('node:crypto');
-const { Result, TerminalError } = require('./reconcile');
-const { Queue } = require('./queue');
+import { randomUUID } from 'node:crypto';
+import { Result, TerminalError } from './reconcile.js';
+import { Queue } from './queue.js';
 
-class Controller {
+export class Controller {
   constructor(name, manager, options = {}) {
     const {
       reconciler = null
@@ -84,4 +83,4 @@ class Controller {
   }
 }
 
-module.exports = { Controller };
+export default { Controller };

@@ -1,10 +1,13 @@
-'use strict';
 const kSeparator = '/';
+const kJSONPatchType = 'application/json-patch+json';
+const kMergePatchType = 'application/merge-patch+json';
+const kStrategicMergePatchType = 'application/strategic-merge-patch+json';
+const kApplyPatchType = 'application/apply-patch+yaml';
 
 /**
  * NamespacedName comprises a resource name and namespace rendered as "namespace/name".
  */
-class NamespacedName {
+export class NamespacedName {
   /**
    * Construct a NamespacedName.
    * @param {string} name - Resource name.
@@ -24,11 +27,19 @@ class NamespacedName {
   }
 }
 
-module.exports = {
+export {
+  kSeparator as separator,
+  kJSONPatchType as JSONPatchType,
+  kMergePatchType as MergePatchType,
+  kStrategicMergePatchType as StrategicMergePatchType,
+  kApplyPatchType as ApplyPatchType
+};
+
+export default {
   NamespacedName,
   separator: kSeparator,
-  JSONPatchType: 'application/json-patch+json',
-  MergePatchType: 'application/merge-patch+json',
-  StrategicMergePatchType: 'application/strategic-merge-patch+json',
-  ApplyPatchType: 'application/apply-patch+yaml'
+  JSONPatchType: kJSONPatchType,
+  MergePatchType: kMergePatchType,
+  StrategicMergePatchType: kStrategicMergePatchType,
+  ApplyPatchType: kApplyPatchType
 };

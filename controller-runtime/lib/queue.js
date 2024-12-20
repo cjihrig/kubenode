@@ -1,7 +1,6 @@
-'use strict';
-const { EventEmitter } = require('node:events');
+import { EventEmitter } from 'node:events';
 
-class Queue extends EventEmitter {
+export class Queue extends EventEmitter {
   constructor() {
     super();
     this.data = [];
@@ -25,4 +24,4 @@ class Queue extends EventEmitter {
   }
 }
 
-module.exports = { Queue };
+export default { Queue };

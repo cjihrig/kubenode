@@ -1,5 +1,5 @@
-'use strict';
-const metav1 = require('../apimachinery/meta/v1');
+import metav1 from '../apimachinery/meta/v1.js';
+
 const kGroupName = 'admission.k8s.io';
 const kOperationConnect = 'CONNECT';
 const kOperationCreate = 'CREATE';
@@ -43,7 +43,7 @@ const kPatchTypeJSONPatch = 'JSONPatch';
  * @property {Object} [response] Object used to create an AdmissionResponse.
  */
 
-class AdmissionRequest {
+export class AdmissionRequest {
   /**
    * Creates a new AdmissionRequest instance.
    * @param {AdmissionRequestOptions} options Options used to construct instance.
@@ -89,7 +89,7 @@ class AdmissionRequest {
   }
 }
 
-class AdmissionResponse {
+export class AdmissionResponse {
   /**
    * Creates a new AdmissionResponse instance.
    * @param {AdmissionResponseOptions} options Options used to construct instance.
@@ -155,7 +155,7 @@ class AdmissionResponse {
   }
 }
 
-class AdmissionReview {
+export class AdmissionReview {
   /**
    * Creates a new AdmissionReview instance.
    * @param {AdmissionReviewOptions} options Options used to construct instance.
@@ -188,7 +188,7 @@ class AdmissionReview {
  * @param {string} [message] additional message to attach to the response.
  * @returns {AdmissionResponse}
  */
-function allowed(message) {
+export function allowed(message) {
   return validationResponse(true, message);
 }
 
@@ -197,7 +197,7 @@ function allowed(message) {
  * @param {string} [message] additional message to attach to the response.
  * @returns {AdmissionResponse}
  */
-function denied(message) {
+export function denied(message) {
   return validationResponse(false, message);
 }
 
@@ -207,7 +207,7 @@ function denied(message) {
  * @param {Error} [err] an error whose message is included in the response.
  * @returns {AdmissionResponse}
  */
-function errored(code, err) {
+export function errored(code, err) {
   const message = err === undefined ? undefined : err?.message ?? String(err);
 
   return new AdmissionResponse({
@@ -222,7 +222,7 @@ function errored(code, err) {
  * @param {string} [message] additional message to attach to the response.
  * @returns {AdmissionResponse}
  */
-function validationResponse(allowed, message) {
+export function validationResponse(allowed, message) {
   let reason;
   let code;
 
@@ -240,7 +240,7 @@ function validationResponse(allowed, message) {
   });
 }
 
-module.exports = {
+export default {
   AdmissionReview,
   AdmissionRequest,
   AdmissionResponse,

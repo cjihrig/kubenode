@@ -1,5 +1,3 @@
-'use strict';
+export class Client {}
 
-class Client {}
-
-module.exports = { Client };
+export default { Client };

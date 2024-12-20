@@ -1,269 +1,41 @@
-import k8s = require("@kubernetes/client-node");
-export namespace apimachinery {
-    let errors: typeof import("./apimachinery/errors");
-    namespace meta {
-        let v1: {
-            StatusReasonUnknown: string;
-            StatusReasonUnauthorized: string;
-            StatusReasonForbidden: string;
-            StatusReasonNotFound: string;
-            StatusReasonAlreadyExists: string;
-            StatusReasonConflict: string;
-            StatusReasonGone: string;
-            StatusReasonInvalid: string;
-            StatusReasonServerTimeout: string;
-            StatusReasonTimeout: string;
-            StatusReasonTooManyRequests: string;
-            StatusReasonBadRequest: string;
-            StatusReasonMethodNotAllowed: string;
-            StatusReasonNotAcceptable: string;
-            StatusReasonRequestEntityTooLarge: string;
-            StatusReasonUnsupportedMediaType: string;
-            StatusReasonInternalError: string;
-            StatusReasonExpired: string;
-            StatusReasonServiceUnavailable: string;
-        };
-    }
-    let types: {
-        NamespacedName: {
-            new (name: string, namespace?: string): {
-                name: string;
-                namespace: string;
-                toString(): string;
-            };
-        };
-        separator: string;
-        JSONPatchType: string;
-        MergePatchType: string;
-        StrategicMergePatchType: string;
-        ApplyPatchType: string;
-    };
+declare namespace _default {
+    export { k8s };
+    export { apimachinery };
+    export { controllerutil };
+    export { Manager };
+    export { newControllerManagedBy };
+    export { Reconciler };
+    export { Request };
+    export { Result };
+    export { Source };
+    export { TerminalError };
+    export { webhook };
 }
-import controllerutil = require("./controllerutil");
-import { Manager } from "./manager";
+export default _default;
+import * as k8s from '@kubernetes/client-node';
+export namespace apimachinery {
+    export { errors };
+    export namespace meta {
+        export { metav1 as v1 };
+    }
+    export { types };
+}
+import controllerutil from './controllerutil.js';
+import { Manager } from './manager.js';
 export const newControllerManagedBy: typeof Builder.controllerManagedBy;
-import { Reconciler } from "./reconcile";
-import { Request } from "./reconcile";
-import { Result } from "./reconcile";
-import { Source } from "./source";
-import { TerminalError } from "./reconcile";
+import { Reconciler } from './reconcile.js';
+import { Request } from './reconcile.js';
+import { Result } from './reconcile.js';
+import { Source } from './source.js';
+import { TerminalError } from './reconcile.js';
 export namespace webhook {
-    export let admission: {
-        AdmissionReview: {
-            new (options: import("./webhook/admission").AdmissionReviewOptions): {
-                apiVersion: string;
-                kind: string;
-                request: {
-                    uid: string;
-                    kind: any;
-                    resource: any;
-                    subResource: string;
-                    requestKind: any;
-                    requestResource: any;
-                    requestSubResource: string;
-                    name: string;
-                    namespace: string;
-                    operation: string;
-                    userInfo: any;
-                    object: any;
-                    oldObject: any;
-                    dryRun: any;
-                    options: any;
-                };
-                response: {
-                    uid: string;
-                    allowed: boolean;
-                    status: any;
-                    patch: any;
-                    patches: any[];
-                    patchType: string;
-                    auditAnnotations: any;
-                    warnings: string[];
-                    complete(req: {
-                        uid: string;
-                        kind: any;
-                        resource: any;
-                        subResource: string;
-                        requestKind: any;
-                        requestResource: any;
-                        requestSubResource: string;
-                        name: string;
-                        namespace: string;
-                        operation: string;
-                        userInfo: any;
-                        object: any;
-                        oldObject: any;
-                        dryRun: any;
-                        options: any;
-                    }): void;
-                };
-            };
-        };
-        AdmissionRequest: {
-            new (options: import("./webhook/admission").AdmissionRequestOptions): {
-                uid: string;
-                kind: any;
-                resource: any;
-                subResource: string;
-                requestKind: any;
-                requestResource: any;
-                requestSubResource: string;
-                name: string;
-                namespace: string;
-                operation: string;
-                userInfo: any;
-                object: any;
-                oldObject: any;
-                dryRun: any;
-                options: any;
-            };
-        };
-        AdmissionResponse: {
-            new (options: import("./webhook/admission").AdmissionResponseOptions): {
-                uid: string;
-                allowed: boolean;
-                status: any;
-                patch: any;
-                patches: any[];
-                patchType: string;
-                auditAnnotations: any;
-                warnings: string[];
-                complete(req: {
-                    uid: string;
-                    kind: any;
-                    resource: any;
-                    subResource: string;
-                    requestKind: any;
-                    requestResource: any;
-                    requestSubResource: string;
-                    name: string;
-                    namespace: string;
-                    operation: string;
-                    userInfo: any;
-                    object: any;
-                    oldObject: any;
-                    dryRun: any;
-                    options: any;
-                }): void;
-            };
-        };
-        GroupName: string;
-        OperationConnect: string;
-        OperationCreate: string;
-        OperationDelete: string;
-        OperationUpdate: string;
-        PatchTypeJSONPatch: string;
-        allowed: (message?: string) => {
-            uid: string;
-            allowed: boolean;
-            status: any;
-            patch: any;
-            patches: any[];
-            patchType: string;
-            auditAnnotations: any;
-            warnings: string[];
-            complete(req: {
-                uid: string;
-                kind: any;
-                resource: any;
-                subResource: string;
-                requestKind: any;
-                requestResource: any;
-                requestSubResource: string;
-                name: string;
-                namespace: string;
-                operation: string;
-                userInfo: any;
-                object: any;
-                oldObject: any;
-                dryRun: any;
-                options: any;
-            }): void;
-        };
-        denied: (message?: string) => {
-            uid: string;
-            allowed: boolean;
-            status: any;
-            patch: any;
-            patches: any[];
-            patchType: string;
-            auditAnnotations: any;
-            warnings: string[];
-            complete(req: {
-                uid: string;
-                kind: any;
-                resource: any;
-                subResource: string;
-                requestKind: any;
-                requestResource: any;
-                requestSubResource: string;
-                name: string;
-                namespace: string;
-                operation: string;
-                userInfo: any;
-                object: any;
-                oldObject: any;
-                dryRun: any;
-                options: any;
-            }): void;
-        };
-        errored: (code: number, err?: Error) => {
-            uid: string;
-            allowed: boolean;
-            status: any;
-            patch: any;
-            patches: any[];
-            patchType: string;
-            auditAnnotations: any;
-            warnings: string[];
-            complete(req: {
-                uid: string;
-                kind: any;
-                resource: any;
-                subResource: string;
-                requestKind: any;
-                requestResource: any;
-                requestSubResource: string;
-                name: string;
-                namespace: string;
-                operation: string;
-                userInfo: any;
-                object: any;
-                oldObject: any;
-                dryRun: any;
-                options: any;
-            }): void;
-        };
-        validationResponse: (allowed: boolean, message?: string) => {
-            uid: string;
-            allowed: boolean;
-            status: any;
-            patch: any;
-            patches: any[];
-            patchType: string;
-            auditAnnotations: any;
-            warnings: string[];
-            complete(req: {
-                uid: string;
-                kind: any;
-                resource: any;
-                subResource: string;
-                requestKind: any;
-                requestResource: any;
-                requestSubResource: string;
-                name: string;
-                namespace: string;
-                operation: string;
-                userInfo: any;
-                object: any;
-                oldObject: any;
-                dryRun: any;
-                options: any;
-            }): void;
-        };
-    };
+    export { admission };
     export { Server };
 }
-import { Builder } from "./builder";
-import { Server } from "./webhook/server";
-export { defaultExport as default, k8s, controllerutil, Manager, Reconciler, Request, Result, Source, TerminalError };
+import errors from './apimachinery/errors.js';
+import metav1 from './apimachinery/meta/v1.js';
+import types from './apimachinery/types.js';
+import { Builder } from './builder.js';
+import admission from './webhook/admission.js';
+import { Server } from './webhook/server.js';
+export { k8s, controllerutil, Manager, Reconciler, Request, Result, Source, TerminalError };

@@ -1,8 +1,7 @@
-'use strict';
-const k8s = require('@kubernetes/client-node');
-const { Request } = require('./reconcile');
+import * as k8s from '@kubernetes/client-node';
+import { Request } from './reconcile.js';
 
-class Source {
+export class Source {
   constructor(kubeconfig, client, kind, apiVersion = 'v1') {
     if (!(kubeconfig instanceof k8s.KubeConfig)) {
       throw new TypeError('kubeconfig must be a KubeConfig instance');
@@ -96,4 +95,4 @@ function k8sObjectToRequest(obj) {
   return new Request(name, namespace);
 }
 
-module.exports = { Source };
+export default { Source };

@@ -1,30 +1,34 @@
-'use strict';
-const k8s = require('@kubernetes/client-node');
-const { Builder } = require('./builder');
-const controllerutil = require('./controllerutil');
-const { Manager } = require('./manager');
-const {
+import * as k8s from '@kubernetes/client-node';
+import errors from './apimachinery/errors.js';
+import metav1 from './apimachinery/meta/v1.js';
+import types from './apimachinery/types.js';
+import { Builder } from './builder.js';
+import controllerutil from './controllerutil.js';
+import { Manager } from './manager.js';
+import {
   Reconciler,
   Request,
   Result,
   TerminalError
-} = require('./reconcile');
-const { Server } = require('./webhook/server');
-const { Source } = require('./source');
+} from './reconcile.js';
+import admission from './webhook/admission.js';
+import { Server } from './webhook/server.js';
+import { Source } from './source.js';
+
 const newControllerManagedBy = Builder.controllerManagedBy;
 const apimachinery = {
-  errors: require('./apimachinery/errors'),
+  errors,
   meta: {
-    v1: require('./apimachinery/meta/v1')
+    v1: metav1
   },
-  types: require('./apimachinery/types')
+  types
 };
 const webhook = {
-  admission: require('./webhook/admission'),
+  admission,
   Server
 };
 
-const defaultExport = {
+export {
   k8s,
   apimachinery,
   controllerutil,
@@ -38,16 +42,16 @@ const defaultExport = {
   webhook
 };
 
-module.exports = defaultExport;
-module.exports.default = defaultExport;
-module.exports.k8s = k8s;
-module.exports.apimachinery = apimachinery;
-module.exports.controllerutil = controllerutil;
-module.exports.Manager = Manager;
-module.exports.newControllerManagedBy = newControllerManagedBy;
-module.exports.Reconciler = Reconciler;
-module.exports.Request = Request;
-module.exports.Result = Result;
-module.exports.Source = Source;
-module.exports.TerminalError = TerminalError;
-module.exports.webhook = webhook;
+export default {
+  k8s,
+  apimachinery,
+  controllerutil,
+  Manager,
+  newControllerManagedBy,
+  Reconciler,
+  Request,
+  Result,
+  Source,
+  TerminalError,
+  webhook
+};

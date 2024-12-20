@@ -1,30 +1,3 @@
-export type PromiseWithResolvers = {
-    promise: Promise<any>;
-    resolve: Function;
-    reject: Function;
-};
-export type ServerOptions = {
-    /**
-     * The directory that contains the server key and certificate.
-     */
-    certDir?: string;
-    /**
-     * The server certificate name. Defaults to tls.crt.
-     */
-    certName?: string;
-    /**
-     * If true, the server uses HTTP instead of HTTPS.
-     */
-    insecure?: boolean;
-    /**
-     * The server key name. Defaults to tls.key.
-     */
-    keyName?: string;
-    /**
-     * The port number that the server will bind to.
-     */
-    port?: number;
-};
 /**
  * @typedef {Object} ServerOptions
  * @property {string} [certDir] The directory that contains the server key and certificate.
@@ -63,3 +36,34 @@ export class Server {
      */
     start(ctx: any): Promise<any>;
 }
+declare namespace _default {
+    export { Server };
+}
+export default _default;
+export type PromiseWithResolvers = {
+    promise: Promise<any>;
+    resolve: Function;
+    reject: Function;
+};
+export type ServerOptions = {
+    /**
+     * The directory that contains the server key and certificate.
+     */
+    certDir?: string;
+    /**
+     * The server certificate name. Defaults to tls.crt.
+     */
+    certName?: string;
+    /**
+     * If true, the server uses HTTP instead of HTTPS.
+     */
+    insecure?: boolean;
+    /**
+     * The server key name. Defaults to tls.key.
+     */
+    keyName?: string;
+    /**
+     * The port number that the server will bind to.
+     */
+    port?: number;
+};

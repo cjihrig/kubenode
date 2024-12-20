@@ -1,7 +1,7 @@
-'use strict';
-const assert = require('node:assert');
-const { test } = require('node:test');
-const admission = require('../../lib/webhook/admission');
+import assert from 'node:assert';
+import { test } from 'node:test';
+import admission from '../../lib/webhook/admission.js';
+
 const fixtures = {
   admissionRequestDelete: {
     uid: '66bea49a-e26d-461d-81d2-4002cfbd7934',

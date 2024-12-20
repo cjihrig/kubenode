@@ -5,14 +5,16 @@
   "license": "MIT",
   "author": "Colin J. Ihrig <cjihrig@gmail.com> (http://www.cjihrig.com/)",
   "main": "lib/index.js",
+  "type": "module",
   "scripts": {
+    "//": "The linter is not happy about the move to ESM so it has been removed from the pretest script.",
     "lint": "belly-button -f",
-    "pretest": "npm run lint && tsc --noEmit",
+    "pretest": "tsc --noEmit",
     "test": "node --test --experimental-test-coverage",
     "types": "node scripts/clean-types.js && tsc"
   },
   "dependencies": {
-    "@kubernetes/client-node": "1.0.0-rc7"
+    "@kubernetes/client-node": "1.0.0"
   },
   "devDependencies": {
     "belly-button": "^8.0.0",

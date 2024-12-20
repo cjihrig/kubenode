@@ -11,4 +11,8 @@ export class Controller {
     watch(source: any): void;
     #private;
 }
-import { Queue } from "./queue";
+declare namespace _default {
+    export { Controller };
+}
+export default _default;
+import { Queue } from './queue.js';

@@ -1,9 +1,8 @@
-'use strict';
-const { Controller } = require('./controller');
-const { Reconciler } = require('./reconcile');
-const { Source } = require('./source');
+import { Controller } from './controller.js';
+import { Reconciler } from './reconcile.js';
+import { Source } from './source.js';
 
-class Builder {
+export class Builder {
   constructor(manager) {
     this.manager = manager;
     this.name = '';
@@ -78,4 +77,4 @@ class Builder {
   }
 }
 
-module.exports = { Builder };
+export default { Builder };

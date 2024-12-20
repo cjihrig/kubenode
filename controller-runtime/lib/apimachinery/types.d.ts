@@ -16,9 +16,18 @@ export class NamespacedName {
      */
     toString(): string;
 }
+declare namespace _default {
+    export { NamespacedName };
+    export { kSeparator as separator };
+    export { kJSONPatchType as JSONPatchType };
+    export { kMergePatchType as MergePatchType };
+    export { kStrategicMergePatchType as StrategicMergePatchType };
+    export { kApplyPatchType as ApplyPatchType };
+}
+export default _default;
 declare const kSeparator: "/";
-export declare let JSONPatchType: string;
-export declare let MergePatchType: string;
-export declare let StrategicMergePatchType: string;
-export declare let ApplyPatchType: string;
-export { kSeparator as separator };
+declare const kJSONPatchType: "application/json-patch+json";
+declare const kMergePatchType: "application/merge-patch+json";
+declare const kStrategicMergePatchType: "application/strategic-merge-patch+json";
+declare const kApplyPatchType: "application/apply-patch+yaml";
+export { kSeparator as separator, kJSONPatchType as JSONPatchType, kMergePatchType as MergePatchType, kStrategicMergePatchType as StrategicMergePatchType, kApplyPatchType as ApplyPatchType };

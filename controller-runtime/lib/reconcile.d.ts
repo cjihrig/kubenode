@@ -1,14 +1,4 @@
-export class Reconciler {
-    reconcile(context: any, request: any): Promise<void>;
-}
-declare const Request_base: {
-    new (name: string, namespace?: string): {
-        name: string;
-        namespace: string;
-        toString(): string;
-    };
-};
-export class Request extends Request_base {
+export class Request extends NamespacedName {
 }
 export class Result {
     constructor(requeue: any);
@@ -18,4 +8,14 @@ export class Result {
 export class TerminalError extends Error {
     constructor(cause: any);
 }
-export {};
+export class Reconciler {
+    reconcile(context: any, request: any): Promise<void>;
+}
+declare namespace _default {
+    export { Reconciler };
+    export { Request };
+    export { Result };
+    export { TerminalError };
+}
+export default _default;
+import { NamespacedName } from './apimachinery/types.js';

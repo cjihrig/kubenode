@@ -1,6 +1,5 @@
-'use strict';
-const { readdirSync, rmSync } = require('node:fs');
-const { join } = require('node:path');
+import { readdirSync, rmSync } from 'node:fs';
+import { join } from 'node:path';
 const root = join(process.cwd(), 'lib');
 
 cleanDir(root);

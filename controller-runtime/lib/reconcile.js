@@ -1,9 +1,8 @@
-'use strict';
-const { NamespacedName } = require('./apimachinery/types');
+import { NamespacedName } from './apimachinery/types.js';
 
-class Request extends NamespacedName {}
+export class Request extends NamespacedName {}
 
-class Result {
+export class Result {
   constructor(requeue) {
     if (typeof requeue === 'number') {
       this.requeue = true;
@@ -15,20 +14,20 @@ class Result {
   }
 }
 
-class TerminalError extends Error {
+export class TerminalError extends Error {
   constructor(cause) {
     super('terminal error', { cause });
   }
 }
 
-class Reconciler {
+export class Reconciler {
   // eslint-disable-next-line class-methods-use-this, require-await
   async reconcile(context, request) {
     throw new Error('unimplemented reconcile()', { cause: request });
   }
 }
 
-module.exports = {
+export default {
   Reconciler,
   Request,
   Result,
