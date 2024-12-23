@@ -1,0 +1,38 @@
+{
+  "name": "@kubenode/extension-server",
+  "version": "0.1.0",
+  "description": "Utilities for creating Kubernetes API extension servers",
+  "license": "MIT",
+  "author": "Colin J. Ihrig <cjihrig@gmail.com> (http://www.cjihrig.com/)",
+  "type": "module",
+  "main": "lib/index.js",
+  "scripts": {
+    "//": "The linter is not happy about the move to ESM so it has been removed from the pretest script.",
+    "lint": "belly-button -f",
+    "pretest": "tsc --noEmit",
+    "test": "node --test --experimental-test-coverage",
+    "types": "rm -f lib/*.d.ts && tsc"
+  },
+  "devDependencies": {
+    "@types/node": "^22.7.5",
+    "belly-button": "^8.0.0",
+    "typescript": "^5.6.2"
+  },
+  "homepage": "https://github.com/cjihrig/kubenode#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cjihrig/kubenode.git"
+  },
+  "bugs": {
+    "url": "https://github.com/cjihrig/kubenode/issues"
+  },
+  "keywords": [
+    "kubernetes",
+    "extension",
+    "server"
+  ],
+  "directories": {
+    "lib": "lib",
+    "test": "test"
+  }
+}

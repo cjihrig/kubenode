@@ -163,6 +163,8 @@ interchangeably.
 - `@kubenode/controller-runtime` - APIs used to implement Kubernetes
 controllers.
 - `@kubenode/crdgen` - APIs for generating CRDs from TypeScript.
+- `@kubenode/extension-server` - Utilities for creating Kubernetes API extension
+servers.
 - `@kubenode/reference` - Utilities for working with container image references.
 
 ## Future goals
