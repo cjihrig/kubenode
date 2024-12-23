@@ -171,7 +171,6 @@ servers.
 
 - Continue adding missing functionality to the existing APIs.
 - Controller client generation.
-- Tools for building Kubernetes API extension servers.
 
 ## Acknowledgment
 
