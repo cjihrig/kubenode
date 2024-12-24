@@ -169,13 +169,21 @@ async function requestHandler(req, res) {
   if (segments[1] === 'apis') {
     const groupName = segments[2];
     const versionName = segments[3];
-    // TODO(cjihrig): Handle namespaced vs. cluster scoped URLs.
-    const resourceType = segments[4];
+    let resourceType;
+    let resourceName;
+
+    if (segments[4] === 'namespaces') {
+      resourceType = segments[6];
+      resourceName = segments[7];
+    } else {
+      resourceType = segments[4];
+      resourceName = segments[5];
+    }
+
     const fullResource = `${groupName}/${versionName}/${resourceType}`;
     const handlers = this.handlers.get(fullResource);
 
     if (handlers !== undefined) {
-      const resourceName = segments[5];
       let verb;
 
       // TODO(cjihrig): Support map other verbs.
