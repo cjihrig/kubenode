@@ -153,7 +153,7 @@ export class Server {
 }
 
 async function requestHandler(req, res) {
-  debug('received request: %s %s', req.method, req.url);
+  debug('received http request: %s %s', req.method, req.url);
   const url = new URL(req.url, 'http://localhost');
   const cached = this.router.get(url.pathname);
 
@@ -167,43 +167,57 @@ async function requestHandler(req, res) {
   // TODO(cjihrig): Support /openapi/v3 endpoint.
 
   if (segments[1] === 'apis') {
+    // Handle resource requests.
     const groupName = segments[2];
     const versionName = segments[3];
     let resourceType;
     let resourceName;
+    let namespace;
+    let verb;
 
     if (segments[4] === 'namespaces') {
+      namespace = segments[5];
       resourceType = segments[6];
       resourceName = segments[7];
     } else {
+      namespace = '';
       resourceType = segments[4];
       resourceName = segments[5];
     }
 
+    switch (req.method) {
+      // Refs: https://kubernetes.io/docs/reference/access-authn-authz/authorization/#determine-the-request-verb
+      case 'POST':
+        verb = 'create';
+        break;
+      case 'GET':
+      case 'HEAD':
+        // TODO(cjihrig): Support watch.
+        verb = resourceName === undefined ? 'list' : 'get';
+        break;
+      case 'PUT':
+        verb = 'update';
+        break;
+      case 'PATCH':
+        verb = 'patch'
+        break;
+      case 'DELETE':
+        verb = resourceName === undefined ? 'deletecollection' : 'delete';
+        break;
+    }
+
     const fullResource = `${groupName}/${versionName}/${resourceType}`;
-    const handlers = this.handlers.get(fullResource);
-
-    if (handlers !== undefined) {
-      let verb;
-
-      // TODO(cjihrig): Support map other verbs.
-      if (resourceName === undefined) {
-        if (req.method === 'GET') {
-          verb = 'list';
-        }
-      } else {
-        if (req.method === 'GET') {
-          verb = 'get';
-        }
-      }
-
-      const handler = typeof verb === 'string' && handlers[verb];
-      const supportsVerb = typeof handler === 'function';
-      debug('request kubernetes verb: %s, supported=%s', verb, supportsVerb);
-      if (supportsVerb) {
-        handler(req, res);
-        return;
-      }
+    const handler = this.handlers.get(fullResource)?.[verb];
+    const supportsVerb = typeof handler === 'function';
+    debug(
+      'resource request: group="%s" version="%s" type="%s" name="%s" ' +
+      'namespace="%s" verb="%s" supported=%s',
+      groupName, versionName, resourceType, resourceName, namespace, verb,
+      supportsVerb
+    );
+    if (supportsVerb) {
+      handler(req, res);
+      return;
     }
   }
 
