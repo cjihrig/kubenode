@@ -184,3 +184,10 @@ test('isUnsupportedMediaType()', () => {
     body: { code: 415, reason: metav1.StatusReasonAlreadyExists }
   }), false);
 });
+
+test('handles JSON string bodies in error', () => {
+  const err = {
+    body: '{"kind":"Status","apiVersion":"v1","metadata":{},"status":"Failure","message":"pods \\"nginx2\\" not found","reason":"NotFound","details":{"name":"nginx2","kind":"pods"},"code":404}'
+  };
+  assert.strictEqual(errors.isNotFound(err), true);
+});

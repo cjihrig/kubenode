@@ -27,13 +27,34 @@ const knownReasons = new Set([
 // the inconsistencies in the Golang implementation.
 
 /**
+ * getErrorBody() extracts the body from an error object.
+ * @param {Error} err
+ * @returns {any} The body as an object if possible. If not possible, it will be the input body.
+ */
+function getErrorBody(err) {
+  // @ts-ignore
+  const body = err?.body;
+
+  if (typeof body === 'string') {
+    try {
+      // Starting with v1.0.0 of the K8s client, the body is a JSON string.
+      return JSON.parse(body);
+    } catch (err) {
+      // Ignore error.
+    }
+  }
+
+  return body;
+}
+
+/**
  * reasonForError() returns the reason for a particular error.
  * @param {Error} err
  * @returns {string} A StatusReason representing the cause of the error.
  */
 export function reasonForError(err) {
-  // @ts-ignore
-  const reason = err?.body?.reason;
+  const body = getErrorBody(err);
+  const reason = body?.reason;
 
   return knownReasons.has(reason) ? reason : metav1.StatusReasonUnknown;
 }
@@ -45,10 +66,9 @@ export function reasonForError(err) {
  * error.
  */
 export function reasonAndCodeForError(err) {
-  // @ts-ignore
-  const reason = err?.body?.reason;
-  // @ts-ignore
-  const code = err?.body?.code;
+  const body = getErrorBody(err);
+  const reason = body?.reason;
+  const code = body?.code;
   return [reason, code];
 }
 
