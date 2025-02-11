@@ -5,7 +5,7 @@ import { parse } from '../lib/index.js';
 test('parses a simple command successfully', (t) => {
   const spy = t.mock.fn();
   const root = {
-    command: 'foo',
+    name: 'foo',
     run: spy,
   };
   const result = parse(root, ['bar', '--baz', 5]);
@@ -25,23 +25,27 @@ test('parses a simple command successfully', (t) => {
 });
 
 test('throws usage if resolved command is not runnable', () => {
-  const root = { command: 'foo' };
+  const root = { name: 'foo' };
   assert.throws(() => {
     parse(root);
-  }, /Usage:/);
+  }, (err) => {
+    assert.match(err.message, /Usage:/);
+    assert.match(err.message, /foo/);
+    return true;
+  });
 });
 
 test('parses a command with subcommands successfully', (t) => {
   const spy1 = t.mock.fn();
   const spy2 = t.mock.fn();
-  const sub1 = { command: 'baz', run: spy1 };
-  const sub2 = { command: 'bar', run: spy2 };
+  const sub1 = { name: 'baz', run: spy1 };
+  const sub2 = { name: 'bar', run: spy2 };
   const root = {
-    command: 'foo',
+    name: 'foo',
     subcommands() {
       return new Map([
-        [sub1.command, sub1],
-        [sub2.command, sub2],
+        [sub1.name, sub1],
+        [sub2.name, sub2],
       ]);
     }
   };

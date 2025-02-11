@@ -13,6 +13,7 @@
  * @property {function} [run] Executable functionality of the command.
  * @property {Object} [globalFlags] Flags available to this command and all subcommands.
  * @property {Object} [flags] Flags available to this command.
+ * @property {Object} [parserOptions] Additional options to pass to util.parseArgs().
  */
 /**
  * Parses input arguments given a command structure.
@@ -77,4 +78,8 @@ export type Command = {
      * Flags available to this command.
      */
     flags?: any;
+    /**
+     * Additional options to pass to util.parseArgs().
+     */
+    parserOptions?: any;
 };

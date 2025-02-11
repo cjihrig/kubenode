@@ -15,6 +15,7 @@ import { parseArgs } from 'node:util';
  * @property {function} [run] Executable functionality of the command.
  * @property {Object} [globalFlags] Flags available to this command and all subcommands.
  * @property {Object} [flags] Flags available to this command.
+ * @property {Object} [parserOptions] Additional options to pass to util.parseArgs().
  */
 
 /**
@@ -63,6 +64,12 @@ export function parse(root, args) {
   return { command, flags, positionals };
 }
 
+/**
+ * Run Node's util.parseArgs().
+ * @param {string[]} args The arguments to apply to the command.
+ * @param {Command} command The command to apply the arguments to.
+ * @param {Object} globalFlags The current global flags.
+ */
 function runParseArgs(args, command, globalFlags) {
   const config = {
     allowPositionals: true,
@@ -78,12 +85,20 @@ function runParseArgs(args, command, globalFlags) {
   return parseArgs(config);
 }
 
+/**
+ * Throws an exception containing usage text.
+ * @param {Command} command The command to generate usage text for.
+ * @param {Command} root The root command.
+ * @param {Object} globalFlags The current global flags.
+ * @param {string[]} consumedPositionals The arguments that have been consumed by the parser.
+ */
 function usage(command, root, globalFlags, consumedPositionals) {
+  /** @type {Map<string, Command>|undefined} */
   const subcommands = command.subcommands?.();
   let usage = '';
 
   usage += 'Usage:\n';
-  usage += `  ${root.command}`;
+  usage += `  ${root.name}`;
 
   if (consumedPositionals.length > 0) {
     usage += ` ${consumedPositionals.join(' ')}`;
@@ -99,17 +114,17 @@ function usage(command, root, globalFlags, consumedPositionals) {
     let maxCmdLen = 0;
 
     for (const cmd of subcommands.values()) {
-      if (cmd.command.length > maxCmdLen) {
-        maxCmdLen = cmd.command.length;
+      if (cmd.name.length > maxCmdLen) {
+        maxCmdLen = cmd.name.length;
       }
     }
 
     usage += '\nAvailable Commands:\n';
 
     for (const cmd of subcommands.values()) {
-      const padding = maxCmdLen - cmd.command.length;
+      const padding = maxCmdLen - cmd.name.length;
 
-      usage += `  ${cmd.command} ${' '.repeat(padding)} ${cmd.description}\n`;
+      usage += `  ${cmd.name} ${' '.repeat(padding)} ${cmd.description}\n`;
     }
   }
 
