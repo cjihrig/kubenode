@@ -1,6 +1,6 @@
 {
   "name": "@kubenode/argparser",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Kubenode CLI argument parser",
   "license": "MIT",
   "author": "Colin J. Ihrig <cjihrig@gmail.com> (http://www.cjihrig.com/)",
