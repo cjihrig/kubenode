@@ -1,6 +1,6 @@
 {
   "name": "@kubenode/cli",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "description": "Kubenode CLI",
   "license": "MIT",
   "author": "Colin J. Ihrig <cjihrig@gmail.com> (http://www.cjihrig.com/)",
