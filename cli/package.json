@@ -9,7 +9,7 @@
     "lint": "belly-button -f",
     "pretest": "npm run lint && tsc --noEmit --resolveJsonModule",
     "test": "node --test --experimental-test-coverage",
-    "types": "rm lib/*.d.ts && tsc"
+    "types": "rm lib/*.d.ts && rm lib/commands/*.d.ts && rm lib/templates/*.d.ts && tsc --resolveJsonModule"
   },
   "devDependencies": {
     "@types/node": "^22.7.5",
@@ -33,6 +33,7 @@
     "test": "test"
   },
   "dependencies": {
+    "@kubenode/argparser": "^0.1.1",
     "@kubenode/controller-runtime": "^0.2.0",
     "@kubenode/crdgen": "^0.1.1",
     "@kubenode/reference": "^0.1.1",

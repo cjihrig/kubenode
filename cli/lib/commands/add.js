@@ -5,16 +5,17 @@ const kDescription = 'Add resources to a project';
 function subcommands() {
   const api = require('./add_api');
   const webhook = require('./add_webhook');
+  // @ts-ignore
   const commands = new Map([
-    [api.command, api],
-    [webhook.command, webhook]
+    [api.name, api],
+    [webhook.name, webhook]
   ]);
 
   return commands;
 }
 
 module.exports = {
-  command: kCommand,
+  name: kCommand,
   description: kDescription,
   subcommands
 };

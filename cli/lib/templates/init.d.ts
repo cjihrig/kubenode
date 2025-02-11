@@ -1,0 +1,9 @@
+export function dockerfile(data: any): string;
+export function kustomization(data: any): string;
+export function main(data: any): string;
+export function mainTest(data: any): string;
+export function manager(data: any): string;
+export function managerKustomization(data: any): string;
+export function managerRole(data: any): string;
+export function packageJson(data: any): string;
+export function rbacKustomization(data: any): string;

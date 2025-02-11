@@ -60,7 +60,7 @@ function updateManagerKustomization(filename, reference) {
 }
 
 module.exports = {
-  command: kCommand,
+  name: kCommand,
   description: kDescription,
   run
 };

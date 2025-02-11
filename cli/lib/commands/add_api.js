@@ -105,7 +105,7 @@ function lazyLoadTemplates() {
 }
 
 module.exports = {
-  command: kCommand,
+  name: kCommand,
   description: kDescription,
   flags,
   run

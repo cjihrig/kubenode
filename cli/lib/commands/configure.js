@@ -5,14 +5,14 @@ const kDescription = 'Configure project settings';
 function subcommands() {
   const managerImage = require('./configure_manager_image');
   const commands = new Map([
-    [managerImage.command, managerImage]
+    [managerImage.name, managerImage]
   ]);
 
   return commands;
 }
 
 module.exports = {
-  command: kCommand,
+  name: kCommand,
   description: kDescription,
   subcommands
 };
