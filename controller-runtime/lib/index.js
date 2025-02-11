@@ -1,6 +1,7 @@
 import * as k8s from '@kubernetes/client-node';
 import errors from './apimachinery/errors.js';
 import metav1 from './apimachinery/meta/v1.js';
+import schema from './apimachinery/schema.js';
 import types from './apimachinery/types.js';
 import { Builder } from './builder.js';
 import controllerutil from './controllerutil.js';
@@ -21,6 +22,7 @@ const apimachinery = {
   meta: {
     v1: metav1
   },
+  schema,
   types
 };
 const webhook = {

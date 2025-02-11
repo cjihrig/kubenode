@@ -18,6 +18,7 @@ export namespace apimachinery {
     export namespace meta {
         export { metav1 as v1 };
     }
+    export { schema };
     export { types };
 }
 import controllerutil from './controllerutil.js';
@@ -34,6 +35,7 @@ export namespace webhook {
 }
 import errors from './apimachinery/errors.js';
 import metav1 from './apimachinery/meta/v1.js';
+import schema from './apimachinery/schema.js';
 import types from './apimachinery/types.js';
 import { Builder } from './builder.js';
 import admission from './webhook/admission.js';
