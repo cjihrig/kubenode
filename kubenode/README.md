@@ -159,6 +159,7 @@ Flags:
 - `kubenode` or `@kubenode/kubenode` - The top level module that should be
 installed and used. `kubenode` and `@kubenode/kubenode` can be used
 interchangeably.
+- `@kubenode/argparser` - Generic CLI argument parser.
 - `@kubenode/cli` - Implementation of the `kubenode` CLI commands.
 - `@kubenode/controller-runtime` - APIs used to implement Kubernetes
 controllers.
