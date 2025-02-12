@@ -40,6 +40,13 @@ export function hasOwnerReference(ownerRefs: V1OwnerReference[], o: KubernetesOb
  */
 export function setOwnerReference(owner: KubernetesObject, object: KubernetesObject): void;
 /**
+ * removeOwnerReference() removes an owner reference from object. If no such
+ * owner reference exists, an exception is thrown.
+ * @param {KubernetesObject} owner - Kubernetes object used as owner.
+ * @param {KubernetesObject} object - Kubernetes object that is owned.
+ */
+export function removeOwnerReference(owner: KubernetesObject, object: KubernetesObject): void;
+/**
  * hasControllerReference() returns true if the object has an owner reference
  * with the controller property set to true.
  * @param {KubernetesObject} o - Kubernetes object to check.
@@ -77,6 +84,7 @@ declare namespace _default {
     export { hasControllerReference };
     export { hasOwnerReference };
     export { removeFinalizer };
+    export { removeOwnerReference };
     export { setControllerReference };
     export { setOwnerReference };
 }

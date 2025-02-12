@@ -7,6 +7,7 @@ import {
   hasControllerReference,
   hasOwnerReference,
   removeFinalizer,
+  removeOwnerReference,
   setControllerReference,
   setOwnerReference,
 } from '../lib/controllerutil.js';
@@ -350,6 +351,46 @@ suite('setOwnerReference()', () => {
     }, /object has no version/);
     assert.strictEqual(
       hasOwnerReference(obj.metadata.ownerReferences, getOwnerObject()),
+      false
+    );
+  });
+});
+
+suite('removeOwnerReference()', () => {
+  test('successfully removes an existing owner reference', () => {
+    const obj = mockK8sObject();
+    const own = getOwnerObject();
+
+    assert.strictEqual(setOwnerReference(own, obj), undefined);
+    assert.strictEqual(
+      hasOwnerReference(obj.metadata.ownerReferences, own),
+      true
+    );
+    assert.strictEqual(removeOwnerReference(own, obj), undefined);
+    assert.strictEqual(
+      hasOwnerReference(obj.metadata.ownerReferences, own),
+      false
+    );
+    assert.strictEqual(obj.metadata.ownerReferences.length, 0);
+  });
+
+  test('throws if there is no matching owner reference', () => {
+    const obj = mockK8sObject();
+    const own = getOwnerObject();
+
+    obj.metadata.name = 'y';
+    obj.metadata.namespace = 'x';
+    own.metadata.name = 'z';
+    own.metadata.namespace = 'x';
+    assert.strictEqual(
+      hasOwnerReference(obj.metadata.ownerReferences, own),
+      false
+    );
+    assert.throws(() => {
+      removeOwnerReference(own, obj);
+    }, /'x\/y' does not have an owner reference for 'x\/z'/);
+    assert.strictEqual(
+      hasOwnerReference(obj.metadata.ownerReferences, own),
       false
     );
   });

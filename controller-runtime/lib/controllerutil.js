@@ -131,6 +131,33 @@ export function setOwnerReference(owner, object) {
 }
 
 /**
+ * removeOwnerReference() removes an owner reference from object. If no such
+ * owner reference exists, an exception is thrown.
+ * @param {KubernetesObject} owner - Kubernetes object used as owner.
+ * @param {KubernetesObject} object - Kubernetes object that is owned.
+ */
+export function removeOwnerReference(owner, object) {
+  const gvk = getObjectGVK(owner);
+  /** @type {V1OwnerReference} */
+  // @ts-expect-error ref is only a partial type.
+  const ref = {
+    apiVersion: gvk.toAPIVersion(),
+    kind: gvk.kind,
+    name: owner.metadata.name,
+  };
+  const index = findOwnerReferenceIndex(object.metadata.ownerReferences, ref);
+
+  if (index === -1) {
+    const obj = `${object.metadata.namespace}/${object.metadata.name}`;
+    const own = `${owner.metadata.namespace}/${owner.metadata.name}`;
+    const msg = `'${obj}' does not have an owner reference for '${own}'`;
+    throw new Error(msg);
+  }
+
+  object.metadata.ownerReferences.splice(index, 1);
+}
+
+/**
  * hasControllerReference() returns true if the object has an owner reference
  * with the controller property set to true.
  * @param {KubernetesObject} o - Kubernetes object to check.
@@ -283,6 +310,7 @@ export default {
   hasControllerReference,
   hasOwnerReference,
   removeFinalizer,
+  removeOwnerReference,
   setControllerReference,
   setOwnerReference,
 };
