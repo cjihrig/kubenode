@@ -8,6 +8,7 @@ import {
   hasOwnerReference,
   removeFinalizer,
   setControllerReference,
+  setOwnerReference,
 } from '../lib/controllerutil.js';
 
 function mockK8sObject() {
@@ -19,6 +20,15 @@ function mockK8sObject() {
       namespace: 'mock-namespace-1',
     }
   });
+}
+
+function getOwnerObject() {
+  const own = mockK8sObject();
+  own.apiVersion = 'owner.kubenode.io/v2';
+  own.kind = 'OwnerResource';
+  own.metadata.name = 'owner-resource';
+  own.metadata.uid = 'deadbeef';
+  return own;
 }
 
 test('AlreadyOwnedError() constructor', () => {
@@ -119,15 +129,6 @@ suite('hasControllerReference()', () => {
 });
 
 suite('setControllerReference()', () => {
-  function getOwnerObject() {
-    const own = mockK8sObject();
-    own.apiVersion = 'owner.kubenode.io/v2';
-    own.kind = 'OwnerResource';
-    own.metadata.name = 'owner-resource';
-    own.metadata.uid = 'deadbeef';
-    return own;
-  }
-
   test('successfully adds a controller reference', () => {
     const obj = mockK8sObject();
     const own = getOwnerObject();
@@ -238,5 +239,118 @@ suite('hasOwnerReference()', () => {
     }
     const owners = [own];
     assert.strictEqual(hasOwnerReference(owners, obj), true);
+  });
+});
+
+suite('setOwnerReference()', () => {
+  test('successfully adds an owner reference', () => {
+    const obj = mockK8sObject();
+    const own = getOwnerObject();
+
+    assert.strictEqual(
+      hasOwnerReference(obj.metadata.ownerReferences, own),
+      false
+    );
+    assert.deepStrictEqual(obj.metadata.ownerReferences, undefined);
+    assert.strictEqual(setOwnerReference(own, obj), undefined);
+    assert.strictEqual(
+      hasOwnerReference(obj.metadata.ownerReferences, own),
+      true
+    );
+    assert.deepStrictEqual(obj.metadata.ownerReferences, [
+      {
+        apiVersion: 'owner.kubenode.io/v2',
+        kind: 'OwnerResource',
+        name: 'owner-resource',
+        blockOwnerDeletion: false,
+        controller: false,
+        uid: 'deadbeef',
+      }
+    ]);
+  });
+
+  test('an existing owner is overwritten', () => {
+    const obj = mockK8sObject();
+    const own = getOwnerObject();
+    const own2 = getOwnerObject();
+
+    own.metadata.uid = 'aaaaaa';
+    own2.metadata.uid = 'cccccc';
+    assert.strictEqual(setOwnerReference(own, obj), undefined);
+    assert.strictEqual(
+      hasOwnerReference(obj.metadata.ownerReferences, own),
+      true
+    );
+    assert.strictEqual(obj.metadata.ownerReferences[0].uid, 'aaaaaa');
+    assert.strictEqual(setOwnerReference(own2, obj), undefined);
+    assert.strictEqual(
+      hasOwnerReference(obj.metadata.ownerReferences, own2),
+      true
+    );
+    assert.strictEqual(obj.metadata.ownerReferences.length, 1);
+    assert.strictEqual(obj.metadata.ownerReferences[0].uid, 'cccccc');
+  });
+
+  test('cluster-scoped owners are supported', () => {
+    const obj = mockK8sObject();
+    const own = getOwnerObject();
+    delete own.metadata.namespace;
+    assert.strictEqual(setOwnerReference(own, obj), undefined);
+    assert.strictEqual(
+      hasOwnerReference(obj.metadata.ownerReferences, own),
+      true
+    );
+  });
+
+  test('cluster-scoped resources cannot have namespaced owners', () => {
+    const obj = mockK8sObject();
+    const own = getOwnerObject();
+    delete obj.metadata.namespace;
+    assert.throws(() => {
+      setOwnerReference(own, obj);
+    }, /cluster-scoped resource must not have a namespace-scoped owner, owner's namespace is 'mock-namespace-1'/);
+    assert.strictEqual(
+      hasOwnerReference(obj.metadata.ownerReferences, own),
+      false
+    );
+  });
+
+  test('namespaced owners must be in same namespace as resource', () => {
+    const obj = mockK8sObject();
+    const own = getOwnerObject();
+    own.metadata.namespace = obj.metadata.namespace + '-x';
+    assert.throws(() => {
+      setOwnerReference(own, obj);
+    }, /cross-namespace owner references are disallowed, owner's namespace is 'mock-namespace-1-x', object's namespace is 'mock-namespace-1'/);
+    assert.strictEqual(
+      hasOwnerReference(obj.metadata.ownerReferences, own),
+      false
+    );
+  });
+
+  test('owner must include a kind', () => {
+    const obj = mockK8sObject();
+    const own = getOwnerObject();
+    delete own.kind;
+    assert.throws(() => {
+      setOwnerReference(own, obj);
+    }, /object has no kind/);
+    assert.strictEqual(
+      hasOwnerReference(obj.metadata.ownerReferences, getOwnerObject()),
+      false
+    );
+  });
+
+  test('owner must include an API version', () => {
+    const obj = mockK8sObject();
+    const own = getOwnerObject();
+    delete own.apiVersion;
+    assert.throws(() => {
+      setOwnerReference(own, obj);
+    }, /object has no version/);
+    assert.strictEqual(
+      hasOwnerReference(obj.metadata.ownerReferences, getOwnerObject()),
+      false
+    );
   });
 });

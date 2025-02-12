@@ -32,6 +32,14 @@ export function removeFinalizer(o: KubernetesObject, finalizer: string): boolean
  */
 export function hasOwnerReference(ownerRefs: V1OwnerReference[], o: KubernetesObject): boolean;
 /**
+ * setOwnerReference() ensures the given object contains an owner reference to
+ * the provided owner object. If a reference to the same owner already exists,
+ * it is overwritten.
+ * @param {KubernetesObject} owner - Kubernetes object used as owner.
+ * @param {KubernetesObject} object - Kubernetes object that is owned.
+ */
+export function setOwnerReference(owner: KubernetesObject, object: KubernetesObject): void;
+/**
  * hasControllerReference() returns true if the object has an owner reference
  * with the controller property set to true.
  * @param {KubernetesObject} o - Kubernetes object to check.
@@ -70,6 +78,7 @@ declare namespace _default {
     export { hasOwnerReference };
     export { removeFinalizer };
     export { setControllerReference };
+    export { setOwnerReference };
 }
 export default _default;
 export type KubernetesObject = import("@kubernetes/client-node").KubernetesObject;

@@ -98,7 +98,36 @@ export function hasOwnerReference(ownerRefs, o) {
     name: o.metadata.name,
   };
 
-  return findOwnerReference(ownerRefs, ref) !== null;
+  return findOwnerReferenceIndex(ownerRefs, ref) !== -1;
+}
+
+/**
+ * setOwnerReference() ensures the given object contains an owner reference to
+ * the provided owner object. If a reference to the same owner already exists,
+ * it is overwritten.
+ * @param {KubernetesObject} owner - Kubernetes object used as owner.
+ * @param {KubernetesObject} object - Kubernetes object that is owned.
+ */
+export function setOwnerReference(owner, object) {
+  validateOwner(owner, object);
+  const gvk = getObjectGVK(owner);
+  /** @type {V1OwnerReference} */
+  const ref = {
+    apiVersion: gvk.toAPIVersion(),
+    kind: gvk.kind,
+    name: owner.metadata.name,
+    blockOwnerDeletion: false,
+    controller: false,
+    uid: owner.metadata.uid,
+  };
+
+  object.metadata.ownerReferences ??= [];
+  const index = findOwnerReferenceIndex(object.metadata.ownerReferences, ref);
+  if (index === -1) {
+    object.metadata.ownerReferences.push(ref);
+  } else {
+    object.metadata.ownerReferences[index] = ref;
+  }
 }
 
 /**
@@ -143,20 +172,24 @@ export function setControllerReference(owner, object) {
 }
 
 /**
- * findOwnerReference() returns the first owner reference that matches ref. If
- * there are no matches, null is returned.
+ * findOwnerReferenceIndex() returns the index of the first owner reference
+ * that matches ref. If there are no matches, -1 is returned.
  * @param {V1OwnerReference[]} ownerRefs - List of owner references to check.
  * @param {V1OwnerReference} ref - Owner reference to search for.
- * @returns {V1OwnerReference|null}
+ * @returns {number}
  */
-function findOwnerReference(ownerRefs, ref) {
+function findOwnerReferenceIndex(ownerRefs, ref) {
+  if (!Array.isArray(ownerRefs)) {
+    return -1;
+  }
+
   for (let i = 0; i < ownerRefs.length; ++i) {
     if (doesReferToSameObject(ownerRefs[i], ref)) {
-      return ownerRefs[i];
+      return i;
     }
   }
 
-  return null;
+  return -1;
 }
 
 /**
@@ -251,4 +284,5 @@ export default {
   hasOwnerReference,
   removeFinalizer,
   setControllerReference,
+  setOwnerReference,
 };
