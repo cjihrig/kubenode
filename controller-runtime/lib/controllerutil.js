@@ -164,7 +164,7 @@ export function removeOwnerReference(owner, object) {
  * @returns {boolean}
  */
 export function hasControllerReference(o) {
-  return getControllerReference(o) !== null;
+  return findControllerReferenceIndex(o) !== -1;
 }
 
 /**
@@ -184,9 +184,11 @@ export function setControllerReference(owner, object) {
     controller: true,
     uid: owner.metadata.uid,
   };
-  const existing = getControllerReference(object);
+  const index = findControllerReferenceIndex(object);
 
-  if (existing !== null) {
+  if (index !== -1) {
+    const existing = object.metadata.ownerReferences[index];
+
     if (!doesReferToSameObject(ref, existing)) {
       throw new AlreadyOwnedError(object, existing);
     }
@@ -196,6 +198,22 @@ export function setControllerReference(owner, object) {
 
   object.metadata.ownerReferences ??= [];
   object.metadata.ownerReferences.push(ref);
+}
+
+/**
+ * removeControllerReference() removes a controller owner reference from object.
+ * If no such owner reference exists, an exception is thrown.
+ * @param {KubernetesObject} o - Kubernetes object that is owned.
+ */
+export function removeControllerReference(o) {
+  const index = findControllerReferenceIndex(o);
+
+  if (index === -1) {
+    const obj = `${o.metadata.namespace}/${o.metadata.name}`;
+    throw new Error(`'${obj}' does not have a controller reference`);
+  }
+
+  o.metadata.ownerReferences.splice(index, 1);
 }
 
 /**
@@ -220,25 +238,26 @@ function findOwnerReferenceIndex(ownerRefs, ref) {
 }
 
 /**
- * getControllerReference() returns the object's owner reference with the
- * controller property set to true, or null if there is no such reference.
+ * findControllerReferenceIndex() returns the index of the object's owner
+ * reference with the controller property set to true, or -1 if there is no such
+ * reference.
  * @param {KubernetesObject} o - Kubernetes object to check.
- * @returns {V1OwnerReference|null}
+ * @returns {number}
  */
-function getControllerReference(o) {
+function findControllerReferenceIndex(o) {
   const owners = o.metadata.ownerReferences;
 
   if (!Array.isArray(owners)) {
-    return null;
+    return -1;
   }
 
   for (let i = 0; i < owners.length; ++i) {
     if (owners[i].controller === true) {
-      return owners[i];
+      return i;
     }
   }
 
-  return null;
+  return -1;
 }
 
 /**
@@ -309,6 +328,7 @@ export default {
   containsFinalizer,
   hasControllerReference,
   hasOwnerReference,
+  removeControllerReference,
   removeFinalizer,
   removeOwnerReference,
   setControllerReference,

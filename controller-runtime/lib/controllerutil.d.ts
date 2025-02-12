@@ -60,6 +60,12 @@ export function hasControllerReference(o: KubernetesObject): boolean;
  */
 export function setControllerReference(owner: KubernetesObject, object: KubernetesObject): void;
 /**
+ * removeControllerReference() removes a controller owner reference from object.
+ * If no such owner reference exists, an exception is thrown.
+ * @param {KubernetesObject} o - Kubernetes object that is owned.
+ */
+export function removeControllerReference(o: KubernetesObject): void;
+/**
  * @typedef {import('@kubernetes/client-node').KubernetesObject} KubernetesObject
  * @typedef {import('@kubernetes/client-node').V1OwnerReference} V1OwnerReference
  */
@@ -83,6 +89,7 @@ declare namespace _default {
     export { containsFinalizer };
     export { hasControllerReference };
     export { hasOwnerReference };
+    export { removeControllerReference };
     export { removeFinalizer };
     export { removeOwnerReference };
     export { setControllerReference };

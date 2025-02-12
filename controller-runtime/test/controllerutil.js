@@ -6,6 +6,7 @@ import {
   containsFinalizer,
   hasControllerReference,
   hasOwnerReference,
+  removeControllerReference,
   removeFinalizer,
   removeOwnerReference,
   setControllerReference,
@@ -220,6 +221,31 @@ suite('setControllerReference()', () => {
     assert.throws(() => {
       setControllerReference(own, obj);
     }, /object has no version/);
+    assert.strictEqual(hasControllerReference(obj), false);
+  });
+});
+
+suite('removeControllerReference()', () => {
+  test('successfully removes an existing controller reference', () => {
+    const obj = mockK8sObject();
+    const own = getOwnerObject();
+
+    assert.strictEqual(setControllerReference(own, obj), undefined);
+    assert.strictEqual(hasControllerReference(obj), true);
+    assert.strictEqual(removeControllerReference(obj), undefined);
+    assert.strictEqual(hasControllerReference(obj), false);
+    assert.strictEqual(obj.metadata.ownerReferences.length, 0);
+  });
+
+  test('throws when a controller reference does not exist', () => {
+    const obj = mockK8sObject();
+
+    obj.metadata.name = 'y';
+    obj.metadata.namespace = 'x';
+    assert.strictEqual(hasControllerReference(obj), false);
+    assert.throws(() => {
+      removeControllerReference(obj);
+    }, /'x\/y' does not have a controller reference/);
     assert.strictEqual(hasControllerReference(obj), false);
   });
 });
