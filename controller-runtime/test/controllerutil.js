@@ -3,8 +3,9 @@ import { suite, test } from 'node:test';
 import {
   AlreadyOwnedError,
   addFinalizer,
-  hasControllerReference,
   containsFinalizer,
+  hasControllerReference,
+  hasOwnerReference,
   removeFinalizer,
   setControllerReference,
 } from '../lib/controllerutil.js';
@@ -218,5 +219,24 @@ suite('setControllerReference()', () => {
       setControllerReference(own, obj);
     }, /object has no version/);
     assert.strictEqual(hasControllerReference(obj), false);
+  });
+});
+
+suite('hasOwnerReference()', () => {
+  test('returns false if reference is not matched', () => {
+    const obj = mockK8sObject();
+    const owners = [{}];
+    assert.strictEqual(hasOwnerReference(owners, obj), false);
+  });
+
+  test('returns true if reference is matched', () => {
+    const obj = mockK8sObject();
+    const own = {
+      apiVersion: obj.apiVersion,
+      kind: obj.kind,
+      name: obj.metadata.name,
+    }
+    const owners = [own];
+    assert.strictEqual(hasOwnerReference(owners, obj), true);
   });
 });

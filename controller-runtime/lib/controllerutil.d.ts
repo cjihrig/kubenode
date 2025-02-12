@@ -24,6 +24,14 @@ export function containsFinalizer(o: KubernetesObject, finalizer: string): boole
  */
 export function removeFinalizer(o: KubernetesObject, finalizer: string): boolean;
 /**
+ * hasOwnerReference() returns true if the owners list contains an owner
+ * reference that matches the object's group, kind, and name.
+ * @param {V1OwnerReference[]} ownerRefs - List of owner references to check.
+ * @param {KubernetesObject} o - Kubernetes object to get GVK from.
+ * @returns {boolean}
+ */
+export function hasOwnerReference(ownerRefs: V1OwnerReference[], o: KubernetesObject): boolean;
+/**
  * hasControllerReference() returns true if the object has an owner reference
  * with the controller property set to true.
  * @param {KubernetesObject} o - Kubernetes object to check.
@@ -59,6 +67,7 @@ declare namespace _default {
     export { addFinalizer };
     export { containsFinalizer };
     export { hasControllerReference };
+    export { hasOwnerReference };
     export { removeFinalizer };
     export { setControllerReference };
 }

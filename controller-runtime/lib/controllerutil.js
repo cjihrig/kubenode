@@ -82,6 +82,26 @@ export function removeFinalizer(o, finalizer) {
 }
 
 /**
+ * hasOwnerReference() returns true if the owners list contains an owner
+ * reference that matches the object's group, kind, and name.
+ * @param {V1OwnerReference[]} ownerRefs - List of owner references to check.
+ * @param {KubernetesObject} o - Kubernetes object to get GVK from.
+ * @returns {boolean}
+ */
+export function hasOwnerReference(ownerRefs, o) {
+  const gvk = getObjectGVK(o);
+  /** @type {V1OwnerReference} */
+  // @ts-expect-error ref is only a partial type.
+  const ref = {
+    apiVersion: gvk.toAPIVersion(),
+    kind: gvk.kind,
+    name: o.metadata.name,
+  };
+
+  return findOwnerReference(ownerRefs, ref) !== null;
+}
+
+/**
  * hasControllerReference() returns true if the object has an owner reference
  * with the controller property set to true.
  * @param {KubernetesObject} o - Kubernetes object to check.
@@ -120,6 +140,23 @@ export function setControllerReference(owner, object) {
 
   object.metadata.ownerReferences ??= [];
   object.metadata.ownerReferences.push(ref);
+}
+
+/**
+ * findOwnerReference() returns the first owner reference that matches ref. If
+ * there are no matches, null is returned.
+ * @param {V1OwnerReference[]} ownerRefs - List of owner references to check.
+ * @param {V1OwnerReference} ref - Owner reference to search for.
+ * @returns {V1OwnerReference|null}
+ */
+function findOwnerReference(ownerRefs, ref) {
+  for (let i = 0; i < ownerRefs.length; ++i) {
+    if (doesReferToSameObject(ownerRefs[i], ref)) {
+      return ownerRefs[i];
+    }
+  }
+
+  return null;
 }
 
 /**
@@ -211,6 +248,7 @@ export default {
   addFinalizer,
   containsFinalizer,
   hasControllerReference,
+  hasOwnerReference,
   removeFinalizer,
   setControllerReference,
 };
