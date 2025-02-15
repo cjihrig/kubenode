@@ -1,73 +1,12 @@
 import assert from 'node:assert';
 import { suite, test } from 'node:test';
+import { LeaseLock } from '../../lib/leaderelection/leaselock.js';
 import {
-  LeaseLock
-} from '../../lib/leaderelection/leaselock.js';
-
-function getMetaObject() {
-  return { name: 'test-name', namespace: 'test-ns' };
-}
-
-function getClient(mock) {
-  return {
-    createNamespacedLease: mock.fn((o) => {
-      return o.body;
-    }),
-    readNamespacedLease: mock.fn(() => {
-      return getLease();
-    }),
-    replaceNamespacedLease: mock.fn((o) => {
-      return o.body;
-    }),
-  };
-}
-
-function getLockConfig(mock) {
-  return {
-    identity: 'test-id',
-    eventRecorder: {
-      event: mock.fn(),
-    }
-  };
-}
-
-function getRecord() {
-  // V1MicroTime extends from JS Date.
-  const acquireTime = new Date();
-  const renewTime = new Date(acquireTime.getTime() + (2 * 60_000));
-
-  return {
-    holderIdentity: 'foo',
-    leaseDurationSeconds: 15,
-    acquireTime,
-    renewTime,
-    leaderTransitions: 100,
-    strategy: undefined,
-    preferredHolder: undefined,
-  };
-}
-
-function getLease() {
-  // V1MicroTime extends from JS Date.
-  const acquireTime = new Date();
-  const renewTime = new Date(acquireTime.getTime() + (2 * 60_000));
-
-  return {
-    apiVersion: 'coordination.k8s.io/v1',
-    kind: 'Lease',
-    metadata: {
-      name: 'test-name',
-      namespace: 'test-ns',
-    },
-    spec: {
-      holderIdentity: 'bar',
-      leaseDurationSeconds: 13,
-      acquireTime,
-      renewTime,
-      leaseTransitions: 99,
-    }
-  };
-}
+  getClient,
+  getLockConfig,
+  getMetaObject,
+  getRecord,
+} from './test-utils.js';
 
 suite('LeaseLock', () => {
   test('LeaseLock() constructor', (t) => {
@@ -97,18 +36,18 @@ suite('LeaseLock', () => {
     const client = getClient(t.mock);
     const lockConfig = getLockConfig(t.mock);
     const ll = new LeaseLock(meta, client, lockConfig);
-    assert.strictEqual(ll.lease, null);
+    assert.strictEqual(await ll.create(getRecord()), undefined);
     const record = await ll.get();
-    assert.strictEqual(record.holderIdentity, 'bar');
-    assert.strictEqual(record.leaseDurationSeconds, 13);
+    assert.strictEqual(record.holderIdentity, 'foo');
+    assert.strictEqual(record.leaseDurationSeconds, 15);
     assert.ok(record.acquireTime);
     assert.strictEqual(
       record.renewTime.getTime(), record.acquireTime.getTime() + 2 * 60_000
     );
-    assert.strictEqual(record.leaderTransitions, 99);
+    assert.strictEqual(record.leaderTransitions, 100);
     assert.strictEqual(record.strategy, undefined);
     assert.strictEqual(record.preferredHolder, undefined);
-    assert.strictEqual(ll.lease.spec.holderIdentity, 'bar');
+    assert.strictEqual(ll.lease.spec.holderIdentity, 'foo');
   });
 
   suite('LeaseLock.prototype.update()', () => {
