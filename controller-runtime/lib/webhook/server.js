@@ -10,6 +10,13 @@ import {
   errored
 } from './admission.js';
 
+/**
+ * @typedef {import('node:http').RequestListener} RequestListener
+ * @typedef {import('node:http').IncomingMessage} IncomingMessage
+ * @typedef {import('node:http').ServerResponse} ServerResponse
+ * @typedef {import('../context.js').Context} Context
+ */
+
 const kContentTypeHeader = 'content-type';
 const kContentTypeValue = 'application/json';
 const kDefaultCertName = 'tls.crt';
@@ -30,6 +37,9 @@ const kResponseHeaders = { [kContentTypeHeader]: kContentTypeValue };
  * @property {number} [port] The port number that the server will bind to.
  */
 
+/**
+ * Server is a generic Kubernetes webhook server.
+ */
 export class Server {
   /**
    * Creates a new Server instance.
@@ -38,9 +48,7 @@ export class Server {
   constructor(options) {
     if (options === undefined) {
       options = {};
-    }
-
-    if (options === null || typeof options !== 'object') {
+    } else if (options === null || typeof options !== 'object') {
       throw new TypeError('options must be an object');
     }
 
@@ -74,7 +82,9 @@ export class Server {
 
     this.context = null;
     this.port = port;
+    /** @type RequestListener */
     this.requestHandler = requestHandler.bind(this);
+    /** @type Map<string, function> */
     this.router = new Map();
 
     if (insecure) {
@@ -136,6 +146,7 @@ export class Server {
     req.url = settings.url;
     // @ts-ignore
     req.headers = settings.headers ?? {};
+    // @ts-ignore
     this.requestHandler(req, res);
 
     return promise;
@@ -144,7 +155,7 @@ export class Server {
   /**
    * register() marks the given webhook as being served at the given path.
    * @param {string} path The path to serve the webhook from.
-   * @param {Function} hook The webhook to serve.
+   * @param {function} hook The webhook to serve.
    */
   register(path, hook) {
     if (typeof path !== 'string') {
@@ -164,8 +175,8 @@ export class Server {
 
   /**
    * start() runs the server.
-   * @param {Object} ctx The context object.
-   * @returns {Promise}
+   * @param {Context} ctx The context object.
+   * @returns {Promise<void>}
    */
   start(ctx) {
     const { promise, resolve, reject } = withResolvers();
@@ -183,6 +194,12 @@ export class Server {
   }
 }
 
+/**
+ * requestHandler() handles an individual HTTP request.
+ * @param {IncomingMessage} req The HTTP request object.
+ * @param {ServerResponse} res The HTTP response object.
+ * @returns {Promise<void>}
+ */
 async function requestHandler(req, res) {
   const url = new URL(req.url, 'http://localhost');
   const hook = this.router.get(url.pathname);
@@ -217,6 +234,11 @@ async function requestHandler(req, res) {
   }
 }
 
+/**
+ * writeAdmissionResponse() writes an Admission response to the response object.
+ * @param {ServerResponse} res The HTTP response object.
+ * @param {AdmissionResponse} response The Admission response.
+ */
 function writeAdmissionResponse(res, response) {
   try {
     const review = new AdmissionReview({ response });
@@ -228,6 +250,11 @@ function writeAdmissionResponse(res, response) {
   }
 }
 
+/**
+ * readAdmissionReview() reads an Admission review from the request object.
+ * @param {IncomingMessage} req The HTTP request object.
+ * @returns {Promise<AdmissionReview>}
+ */
 function readAdmissionReview(req) {
   const { promise, resolve, reject } = withResolvers();
   let body = '';

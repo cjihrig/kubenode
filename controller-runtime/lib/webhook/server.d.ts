@@ -6,16 +6,21 @@
  * @property {string} [keyName] The server key name. Defaults to tls.key.
  * @property {number} [port] The port number that the server will bind to.
  */
+/**
+ * Server is a generic Kubernetes webhook server.
+ */
 export class Server {
     /**
      * Creates a new Server instance.
      * @param {ServerOptions} [options] Options used to construct instance.
      */
     constructor(options?: ServerOptions);
-    context: any;
+    context: import("../context.js").Context;
     port: number;
-    requestHandler: any;
-    router: Map<any, any>;
+    /** @type RequestListener */
+    requestHandler: RequestListener;
+    /** @type Map<string, function> */
+    router: Map<string, Function>;
     server: import("http").Server<typeof import("http").IncomingMessage, typeof import("http").ServerResponse> | import("https").Server<typeof import("http").IncomingMessage, typeof import("http").ServerResponse>;
     /**
      * inject() creates a simulated request in the server.
@@ -26,15 +31,15 @@ export class Server {
     /**
      * register() marks the given webhook as being served at the given path.
      * @param {string} path The path to serve the webhook from.
-     * @param {Function} hook The webhook to serve.
+     * @param {function} hook The webhook to serve.
      */
     register(path: string, hook: Function): void;
     /**
      * start() runs the server.
-     * @param {Object} ctx The context object.
-     * @returns {Promise}
+     * @param {Context} ctx The context object.
+     * @returns {Promise<void>}
      */
-    start(ctx: any): Promise<any>;
+    start(ctx: Context): Promise<void>;
 }
 declare namespace _default {
     export { Server };
@@ -45,6 +50,10 @@ export type PromiseWithResolvers = {
     resolve: Function;
     reject: Function;
 };
+export type RequestListener = import("node:http").RequestListener;
+export type IncomingMessage = import("node:http").IncomingMessage;
+export type ServerResponse = import("node:http").ServerResponse;
+export type Context = import("../context.js").Context;
 export type ServerOptions = {
     /**
      * The directory that contains the server key and certificate.

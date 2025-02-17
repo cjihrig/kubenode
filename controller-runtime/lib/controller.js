@@ -35,6 +35,7 @@ export class Controller {
     this.started = false;
     /** @type Source[] */
     this.startWatches = [];
+    // @ts-ignore 'this' is not a Controller?
     manager.add(this);
   }
 
@@ -101,8 +102,9 @@ export class Controller {
    */
   async #reconcileHandler(context, request) {
     const ctx = context.child();
-    // @ts-ignore TODO(cjihrig): Need better typing here.
-    ctx.reconcileID = randomUUID();
+    // TODO(cjihrig): Make a ReconcileContext type. It should have the
+    // reconcileID and client as properties, and probably other things.
+    ctx.values.set('reconcileID', randomUUID());
     let result;
 
     try {
