@@ -1,13 +1,32 @@
-import * as k8s from '@kubernetes/client-node';
+import {
+  KubeConfig,
+  KubernetesObjectApi,
+  makeInformer,
+} from '@kubernetes/client-node';
 import { Request } from './reconcile.js';
 
+/**
+ * @typedef {import('@kubernetes/client-node').KubernetesObject} KubernetesObject
+ * @typedef {import('./context.js').Context} Context
+ */
+
+/**
+ * Source provides event streams to hook up to Controllers.
+ */
 export class Source {
+  /**
+   * Construct a Source.
+   * @param {KubeConfig} kubeconfig - Kubeconfig to use.
+   * @param {KubernetesObjectApi} client - Kubernetes client to use.
+   * @param {string} kind - Resource kind to watch.
+   * @param {string} [apiVersion] - API version of resource to watch.
+   */
   constructor(kubeconfig, client, kind, apiVersion = 'v1') {
-    if (!(kubeconfig instanceof k8s.KubeConfig)) {
+    if (!(kubeconfig instanceof KubeConfig)) {
       throw new TypeError('kubeconfig must be a KubeConfig instance');
     }
 
-    if (!(client instanceof k8s.KubernetesObjectApi)) {
+    if (!(client instanceof KubernetesObjectApi)) {
       throw new TypeError('client must be a KubernetesObjectApi instance');
     }
 
@@ -26,6 +45,12 @@ export class Source {
     this.informer = null;
   }
 
+  /**
+   * start() causes the Source to start watching for and reporting events.
+   * @param {Context} context - Kubeconfig to use.
+   * @param {Object} queue - Queue to insert observed events into.
+   * @returns {Promise<void>}
+   */
   async start(context, queue) {
     let apiVersion = this.apiVersion;
 
@@ -58,7 +83,7 @@ export class Source {
       informerPath = `/api/${apiVersion}/${resource.name}`;
     }
 
-    this.informer = k8s.makeInformer(this.kubeconfig, informerPath, () => {
+    this.informer = makeInformer(this.kubeconfig, informerPath, () => {
       return this.client.list(apiVersion, this.kind);
     });
 
@@ -89,6 +114,11 @@ export class Source {
   }
 }
 
+/**
+ * k8sObjectToRequest() creates a Request based on a Kubernetes object.
+ * @param {KubernetesObject} obj - Kubernetes object.
+ * @returns {Request}
+ */
 function k8sObjectToRequest(obj) {
   const { name, namespace } = obj.metadata;
 
