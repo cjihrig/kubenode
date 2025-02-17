@@ -1,5 +1,6 @@
 import { setTimeout as sleep } from 'node:timers/promises';
 import { isDeepStrictEqual } from 'node:util';
+import { V1MicroTime } from '@kubernetes/client-node';
 import { isNotFound } from '../apimachinery/errors.js';
 import { LeaseLock } from './leaselock.js';
 
@@ -219,7 +220,7 @@ export class LeaderElector {
    */
   async #tryAcquireOrRenew() {
     const now = Date.now();
-    const date = new Date(now);
+    const date = new V1MicroTime(now);
     /** @type LeaderElectionRecord */
     const leaderElectionRecord = {
       holderIdentity: this.lock.identity,
