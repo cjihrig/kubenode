@@ -1,3 +1,7 @@
+/**
+ * @typedef {import('@kubernetes/client-node').KubernetesObjectApi} KubernetesObjectApi
+ */
+
 const kConstructorKey = Symbol('constructorKey');
 
 /**
@@ -108,6 +112,44 @@ export class Context {
 }
 
 /**
+ * ReconcileContext extends Context to provide additional data that is useful
+ * during reconciliation.
+ */
+export class ReconcileContext extends Context {
+  /**
+   * Construct a ReconcileContext.
+   */
+  constructor(key, parent, reconcileID, client) {
+    super(key, parent);
+    /** @type string */
+    this.reconcileID = reconcileID;
+    /** @type KubernetesObjectApi */
+    this.client = client;
+  }
+
+  /**
+   * child() derives a child ReconcileContext from the current ReconcileContext.
+   * @returns {ReconcileContext}
+   */
+  child() {
+    return new ReconcileContext(
+      kConstructorKey, this, this.reconcileID, this.client
+    );
+  }
+
+  /**
+   * ReconcileContext.fromContext() creates a new ReconcileContext object.
+   * @param {Context} context - Parent context.
+   * @param {string} reconcileID - Unique ID for the reconciliation.
+   * @param {KubernetesObjectApi} client - Kubernetes client.
+   * @returns {ReconcileContext}
+   */
+  static fromContext(context, reconcileID, client) {
+    return new ReconcileContext(kConstructorKey, context, reconcileID, client);
+  }
+}
+
+/**
  * @typedef {Object} PromiseWithResolvers
  * @property {Promise} promise
  * @property {Function} resolve
@@ -125,4 +167,5 @@ function withResolvers() {
 
 export default {
   Context,
+  ReconcileContext,
 }

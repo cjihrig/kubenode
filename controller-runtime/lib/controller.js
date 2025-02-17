@@ -1,4 +1,5 @@
 import { randomUUID } from 'node:crypto';
+import { ReconcileContext } from './context.js';
 import { Result, TerminalError } from './reconcile.js';
 import { Queue } from './queue.js';
 
@@ -101,10 +102,10 @@ export class Controller {
    * @returns {Promise<void>}
    */
   async #reconcileHandler(context, request) {
-    const ctx = context.child();
-    // TODO(cjihrig): Make a ReconcileContext type. It should have the
-    // reconcileID and client as properties, and probably other things.
-    ctx.values.set('reconcileID', randomUUID());
+    const ctx = ReconcileContext.fromContext(
+      // TODO(cjihrig): Provide a client as the third argument here.
+      context.child(), randomUUID(), null
+    );
     let result;
 
     try {

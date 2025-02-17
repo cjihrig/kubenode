@@ -1,6 +1,6 @@
 import assert from 'node:assert';
 import { suite, test } from 'node:test';
-import { Context } from '../lib/context.js';
+import { Context, ReconcileContext } from '../lib/context.js';
 
 suite('Context', () => {
   suite('Context() constructor', () => {
@@ -68,6 +68,51 @@ suite('Context', () => {
       assert.strictEqual(child.signal.aborted, true);
       assert.strictEqual(parent.signal.aborted, false);
       await assert.rejects(child.done);
+    });
+  });
+});
+
+suite('ReconcileContext', () => {
+  suite('ReconcileContext() constructor', () => {
+    test('cannot be constructed directly', () => {
+      assert.throws(() => {
+        new ReconcileContext();
+      }, /Error: illegal constructor/);
+    });
+  });
+
+  suite('ReconcileContext.fromContext()', () => {
+    test('creates a new ReconcileContext instance', () => {
+      const parent = Context.create();
+      const client = {};
+      const rc = ReconcileContext.fromContext(parent, 'foobar', client);
+
+      assert.strictEqual(rc instanceof Context, true);
+      assert.strictEqual(rc instanceof ReconcileContext, true);
+      assert.strictEqual(rc.done instanceof Promise, true);
+      assert.strictEqual(rc.signal instanceof AbortSignal, true);
+      assert.strictEqual(rc.values instanceof Map, true);
+      assert.strictEqual(rc.reconcileID, 'foobar');
+      assert.strictEqual(rc.client, client);
+    });
+  });
+
+  suite('ReconcileContext.prototype.child()', () => {
+    test('creates a child ReconcileContext', () => {
+      const parent = Context.create();
+      const client = {};
+      const rcParent = ReconcileContext.fromContext(parent, 'foobar', client);
+      const rcChild = rcParent.child();
+
+      assert.strictEqual(rcChild instanceof Context, true);
+      assert.strictEqual(rcChild.done instanceof Promise, true);
+      assert.strictEqual(rcChild.signal instanceof AbortSignal, true);
+      assert.strictEqual(rcChild.values instanceof Map, true);
+      assert.strictEqual(rcChild.reconcileID, rcParent.reconcileID);
+      assert.strictEqual(rcChild.client, rcParent.client);
+      assert.notStrictEqual(rcChild.done, parent.done);
+      assert.notStrictEqual(rcChild.signal, parent.signal);
+      assert.notStrictEqual(rcChild.values, parent.values);
     });
   });
 });
