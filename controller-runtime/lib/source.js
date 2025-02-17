@@ -47,7 +47,7 @@ export class Source {
 
   /**
    * start() causes the Source to start watching for and reporting events.
-   * @param {Context} context - Kubeconfig to use.
+   * @param {Context} context - Context to use.
    * @param {Object} queue - Queue to insert observed events into.
    * @returns {Promise<void>}
    */

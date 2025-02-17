@@ -40,8 +40,9 @@ export class Reconciler {
      * operations to make the actual cluster state reflect the desired state.
      * @param {Context} context - The context of the reconciliation.
      * @param {Request} request - The requested resource information.
+     * @returns {Promise<Result>}
      */
-    reconcile(context: Context, request: Request): Promise<void>;
+    reconcile(context: Context, request: Request): Promise<Result>;
 }
 declare namespace _default {
     export { Reconciler };

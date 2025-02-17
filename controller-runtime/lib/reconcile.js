@@ -53,6 +53,7 @@ export class Reconciler {
    * operations to make the actual cluster state reflect the desired state.
    * @param {Context} context - The context of the reconciliation.
    * @param {Request} request - The requested resource information.
+   * @returns {Promise<Result>}
    */
   // eslint-disable-next-line class-methods-use-this, require-await
   async reconcile(context, request) {

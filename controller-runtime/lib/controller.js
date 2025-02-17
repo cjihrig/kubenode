@@ -2,8 +2,28 @@ import { randomUUID } from 'node:crypto';
 import { Result, TerminalError } from './reconcile.js';
 import { Queue } from './queue.js';
 
+/**
+ * @typedef {import('./context.js').Context} Context
+ * @typedef {import('./manager.js').Manager} Manager
+ * @typedef {import('./reconcile.js').Request} Request
+ * @typedef {import('./reconcile.js').Reconciler} Reconciler
+ * @typedef {import('./source.js').Source} Source
+ *
+ * @typedef {Object} ControllerOptions
+ * @property {Reconciler} reconciler The reconciler for the controller.
+ */
+
+/**
+ * Controllers use events to trigger reconcile requests.
+ */
 export class Controller {
-  constructor(name, manager, options = {}) {
+  /**
+   * Construct a Controller.
+   * @param {string} name - Controller name.
+   * @param {Manager} manager - The manager in charge of this controller.
+   * @param {ControllerOptions} [options] - Configuration options.
+   */
+  constructor(name, manager, options) {
     const {
       reconciler = null
     } = options;
@@ -13,14 +33,25 @@ export class Controller {
     this.queue = new Queue();
     this.reconciler = reconciler;
     this.started = false;
+    /** @type Source[] */
     this.startWatches = [];
     manager.add(this);
   }
 
+  /**
+   * reconcile() invokes the controller's reconciler for a specific resource.
+   * @param {Context} context - Context to use.
+   * @param {Request} request - Resource information to reconcile.
+   * @returns {Promise<Result>}
+   */
   reconcile(context, request) {
     return this.reconciler.reconcile(context, request);
   }
 
+  /**
+   * start() begins consuming events.
+   * @param {Context} context - Context to use.
+   */
   start(context) {
     if (this.started) {
       throw new Error('controller already started');
@@ -48,6 +79,10 @@ export class Controller {
     this.startWatches = [];
   }
 
+  /**
+   * watch() begins watching a Source for events.
+   * @param {Source} source - Source to watch for events.
+   */
   watch(source) {
     if (!this.started) {
       this.startWatches.push(source);
@@ -57,8 +92,17 @@ export class Controller {
     source.start(this.context, this.queue);
   }
 
+  /**
+   * reconcileHandler() is an internal method that invokes the reconciler, and
+   * processes the result, including requeuing logic.
+   * @param {Context} context - Context to use.
+   * @param {Request} request - Resource information to reconcile.
+   * @returns {Promise<void>}
+   */
   async #reconcileHandler(context, request) {
-    const ctx = { ...context, reconcileID: randomUUID() };
+    const ctx = context.child();
+    // @ts-ignore TODO(cjihrig): Need better typing here.
+    ctx.reconcileID = randomUUID();
     let result;
 
     try {
