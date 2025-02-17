@@ -18,6 +18,9 @@ export class Context {
   /** @type Map */
   #values;
 
+  /**
+   * Construct a Context.
+   */
   constructor(key, parent) {
     if (key !== kConstructorKey) {
       throw new Error('illegal constructor');
@@ -48,22 +51,41 @@ export class Context {
     });
   }
 
+  /**
+   * cancel() aborts the context.
+   */
   cancel() {
     this.#controller.abort();
   }
 
+  /**
+   * child() derives a child context from the current context.
+   * @returns {Context}
+   */
   child() {
     return new Context(kConstructorKey, this);
   }
 
+  /**
+   * A Promise that is settled based on the state of the context.
+   * @type {Promise}
+   */
   get done() {
     return this.#promise.promise;
   }
 
+  /**
+   * An AbortSignal that aborts when the context is cancelled.
+   * @type {AbortSignal}
+   */
   get signal() {
     return this.#signal;
   }
 
+  /**
+   * A Map of arbitrary user data stored on the context.
+   * @type {Map}
+   */
   get values() {
     if (this.#values === null) {
       if (this.#parent === null) {
@@ -76,6 +98,10 @@ export class Context {
     return this.#values;
   }
 
+  /**
+   * Context.create() creates a new context object.
+   * @returns {Context}
+   */
   static create() {
     return new Context(kConstructorKey, null);
   }
