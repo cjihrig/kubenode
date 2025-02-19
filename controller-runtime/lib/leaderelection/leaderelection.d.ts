@@ -20,9 +20,10 @@ export class LeaderElector {
     leaseValidUntil: number;
     /**
      * run() starts the leader election loop.
+     * @param {Context} ctx - The context to use.
      * @returns {Promise<void>}
      */
-    run(): Promise<void>;
+    run(ctx: Context): Promise<void>;
     /**
      * isLeader() returns true if the last observed leader was this client, and
      * false otherwise.
@@ -98,3 +99,4 @@ export type LeaderElectionConfig = {
     name: string;
 };
 import { LeaseLock } from './leaselock.js';
+import { Context } from '../context.js';

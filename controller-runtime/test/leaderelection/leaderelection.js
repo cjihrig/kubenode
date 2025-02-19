@@ -1,7 +1,7 @@
 import assert from 'node:assert';
 import { suite, test } from 'node:test';
+import { Context } from '../../lib/context.js';
 import { LeaderElector } from '../../lib/leaderelection/leaderelection.js';
-import { LeaseLock } from '../../lib/leaderelection/leaselock.js';
 import {
   createNotFoundError,
   getLeaseLock,
@@ -176,6 +176,16 @@ suite('LeaderElector', () => {
   });
 
   suite('LeaderElector.prototype.run()', () => {
+    test('throws if context is not provided', async (t) => {
+      const options = getLeaderElectorOptions(t.mock);
+      const elector = new LeaderElector(options);
+
+      await assert.rejects(
+        elector.run({}),
+        /TypeError: ctx must be a Context instance/,
+      );
+    });
+
     test('creates a new lease if one does not exist', async (t) => {
       const options = getLeaderElectorOptions(t.mock);
       const stoppedLeading = withResolvers();
@@ -211,7 +221,7 @@ suite('LeaderElector', () => {
       };
 
       const elector = new LeaderElector(options);
-      elector.run();
+      elector.run(Context.create());
       await stoppedLeading.promise;
     });
 
@@ -249,7 +259,7 @@ suite('LeaderElector', () => {
       };
 
       const elector = new LeaderElector(options);
-      elector.run();
+      elector.run(Context.create());
       await stoppedLeading.promise;
     });
 
@@ -288,8 +298,71 @@ suite('LeaderElector', () => {
       };
 
       const elector = new LeaderElector(options);
-      elector.run();
+      elector.run(Context.create());
       await stoppedLeading.promise;
+    });
+
+    test('can be cancelled via the context during acquire', async (t) => {
+      const options = getLeaderElectorOptions(t.mock);
+
+      // Make sure the lease does not exist and cannot be acquired via creation.
+      options.lock.client.readNamespacedLease.mock.mockImplementationOnce(() => {
+        const err = createNotFoundError();
+        throw err;
+      });
+      options.lock.client.createNamespacedLease.mock.mockImplementationOnce(() => {
+        throw new Error('boom');
+      });
+      options.callbacks = {
+        onStartedLeading() {
+          throw new Error('should not be called');
+        },
+        onStoppedLeading() {
+          throw new Error('should not be called');
+        },
+      };
+
+      const elector = new LeaderElector(options);
+      const ctx = Context.create();
+      const p = elector.run(ctx);
+      ctx.cancel();
+      await p;
+      await assert.rejects(ctx.done);
+    });
+
+    test('can be cancelled via the context during renewal', async (t) => {
+      const options = getLeaderElectorOptions(t.mock);
+      const ctx = Context.create();
+      const stoppedLeading = withResolvers();
+      let startedLeadingCalled = false;
+
+      options.lock.client.replaceNamespacedLease.mock.mockImplementationOnce(() => {
+        options.lock.client.createNamespacedLease.mock.mockImplementationOnce(() => {
+          throw new Error('boom');
+        });
+
+        throw new Error('boom');
+      });
+
+      options.callbacks = {
+        onStartedLeading() {
+          ctx.cancel();
+          startedLeadingCalled = true;
+        },
+        onStoppedLeading() {
+          if (startedLeadingCalled) {
+            stoppedLeading.resolve();
+          } else {
+            stoppedLeading.reject(new Error('expected callbacks not met'));
+          }
+        },
+      };
+
+      const elector = new LeaderElector(options);
+      const p = elector.run(ctx);
+      await stoppedLeading.promise;
+      await p;
+      await assert.rejects(ctx.done);
     });
   });
 });

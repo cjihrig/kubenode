@@ -2,6 +2,7 @@ import { setTimeout as sleep } from 'node:timers/promises';
 import { isDeepStrictEqual } from 'node:util';
 import { V1MicroTime } from '@kubernetes/client-node';
 import { isNotFound } from '../apimachinery/errors.js';
+import { Context } from '../context.js';
 import { LeaseLock } from './leaselock.js';
 
 /**
@@ -94,14 +95,23 @@ export class LeaderElector {
 
   /**
    * run() starts the leader election loop.
+   * @param {Context} ctx - The context to use.
    * @returns {Promise<void>}
    */
-  async run() {
-    await this.#acquire();
+  async run(ctx) {
+    if (!(ctx instanceof Context)) {
+      throw new TypeError('ctx must be a Context instance');
+    }
+
+    const acquired = await this.#acquire(ctx);
+    if (!acquired) {
+      return;
+    }
+
     queueMicrotask(() => {
       this.callbacks.onStartedLeading();
     });
-    await this.#renew();
+    await this.#renew(ctx);
     queueMicrotask(() => {
       this.callbacks.onStoppedLeading();
     });
@@ -142,42 +152,52 @@ export class LeaderElector {
   /**
    * acquire() loops calling tryAcquireOrRenew() and returns true when the lease
    * is successfully acquired.
+   * @param {Context} ctx - The context to use.
    * @returns {Promise<boolean>}
    */
-  async #acquire() {
-    while (true) {
-      const oldRecord = this.record;
-      const success = await this.#tryAcquireOrRenew();
+  async #acquire(ctx) {
+    const cancel = ctx.done.catch(() => {});
+    let success = false;
 
+    while (!ctx.signal.aborted) {
+      const oldRecord = this.record;
+
+      success = await this.#tryAcquireOrRenew(ctx);
       this.#maybeReportNewLeader(oldRecord, this.record);
 
       if (success) {
         break;
       }
 
-      await sleep(jitter(this.retryPeriod, kJitterFactor));
+      await Promise.race([
+        sleep(jitter(this.retryPeriod, kJitterFactor)),
+        cancel,
+      ]);
     }
 
     this.lock.recordEvent('became leader');
-    return true;
+    return success;
   }
 
   /**
    * renew() loops calling tryAcquireOrRenew() and returns when
    * tryAcquireOrRenew() fails.
+   * @param {Context} ctx - The context to use.
    * @returns {Promise<void>}
    */
-  async #renew() {
-    while (true) {
+  async #renew(ctx) {
+    const cancel = ctx.done.catch(() => {});
+
+    while (!ctx.signal.aborted) {
       const oldRecord = this.record;
       const renewStart = Date.now();
       let success = false;
       let expired = false;
 
       while (!success && !expired) {
-        success = await this.#tryAcquireOrRenew();
+        success = await this.#tryAcquireOrRenew(ctx);
         expired = Date.now() - renewStart > this.renewDeadline;
-        await sleep(this.retryPeriod);
+        await Promise.race([sleep(this.retryPeriod), cancel]);
       }
 
       this.#maybeReportNewLeader(oldRecord, this.record);
@@ -216,9 +236,10 @@ export class LeaderElector {
    * tryAcquireOrRenew() tries to acquire a leader lease if it is not already
    * acquired. Otherwise, it tries to renew the lease if it has already been
    * acquired. Returns true on success.
+   * @param {Context} ctx - The context to use.
    * @returns {Promise<boolean>}
    */
-  async #tryAcquireOrRenew() {
+  async #tryAcquireOrRenew(ctx) {
     const now = Date.now();
     const date = new V1MicroTime(now);
     /** @type LeaderElectionRecord */
