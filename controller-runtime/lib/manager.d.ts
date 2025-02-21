@@ -55,12 +55,12 @@ export type ManagerOptions = {
      * - The name of the resource that
      * leader election will use for holding the leader lock.
      */
-    leaderElectionName?: boolean;
+    leaderElectionName?: string;
     /**
      * - The namespace in which the
      * leader election resource will be created.
      */
-    leaderElectionNamespace?: boolean;
+    leaderElectionNamespace?: string;
     /**
      * - The duration that non-leader candidates
      * will wait to force acquire leadership. This is measured against time of last

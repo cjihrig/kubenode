@@ -19,9 +19,9 @@ import { Server } from './webhook/server.js';
  * @property {KubernetesObjectApi} [client] - Kubernetes client to use.
  * @property {boolean} [leaderElection] - Whether or not to use leader election
  * when starting the manager.
- * @property {boolean} [leaderElectionName] - The name of the resource that
+ * @property {string} [leaderElectionName] - The name of the resource that
  * leader election will use for holding the leader lock.
- * @property {boolean} [leaderElectionNamespace] - The namespace in which the
+ * @property {string} [leaderElectionNamespace] - The namespace in which the
  * leader election resource will be created.
  * @property {number} [leaseDuration] - The duration that non-leader candidates
  * will wait to force acquire leadership. This is measured against time of last
