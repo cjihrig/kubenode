@@ -1,11 +1,4 @@
 /**
- * @typedef {import('./controller.js').Controller} Controller
- *
- * @typedef {Object} ManagerOptions
- * @property {KubeConfig} [kubeconfig] - Kubeconfig to use.
- * @property {KubernetesObjectApi} [client] - Kubernetes client to use.
- */
-/**
  * Manager runs controllers, webhooks, and other common dependencies.
  */
 export class Manager {
@@ -15,11 +8,8 @@ export class Manager {
      */
     constructor(options?: ManagerOptions);
     client: KubernetesObjectApi;
-    /** @type Controller[] */
-    controllers: Controller[];
     kubeconfig: KubeConfig;
     started: boolean;
-    webhookServer: Server;
     /**
      * add() causes the Manager to manage the provided controller.
      * @param {Controller} controller The controller to manage.
@@ -36,6 +26,7 @@ export class Manager {
      * @returns {Promise<void>}
      */
     start(context?: Context): Promise<void>;
+    #private;
 }
 declare namespace _default {
     export { Manager };
@@ -48,11 +39,47 @@ export type ManagerOptions = {
      */
     kubeconfig?: KubeConfig;
     /**
+     * - Coordination v1 API to use.
+     */
+    coordinationClient?: CoordinationV1Api;
+    /**
      * - Kubernetes client to use.
      */
     client?: KubernetesObjectApi;
+    /**
+     * - Whether or not to use leader election
+     * when starting the manager.
+     */
+    leaderElection?: boolean;
+    /**
+     * - The name of the resource that
+     * leader election will use for holding the leader lock.
+     */
+    leaderElectionName?: boolean;
+    /**
+     * - The namespace in which the
+     * leader election resource will be created.
+     */
+    leaderElectionNamespace?: boolean;
+    /**
+     * - The duration that non-leader candidates
+     * will wait to force acquire leadership. This is measured against time of last
+     * observed ack. Default is 15 seconds.
+     */
+    leaseDuration?: number;
+    /**
+     * - The duration that the acting leader
+     * will retry refreshing leadership before giving up. Default is ten seconds.
+     */
+    renewDeadline?: number;
+    /**
+     * - The duration the LeaderElector clients
+     * should wait between tries of actions. Default is two seconds.
+     */
+    retryPeriod?: number;
 };
 import { KubernetesObjectApi } from '@kubernetes/client-node';
 import { KubeConfig } from '@kubernetes/client-node';
 import { Server } from './webhook/server.js';
 import { Context } from './context.js';
+import { CoordinationV1Api } from '@kubernetes/client-node';

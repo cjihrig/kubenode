@@ -9,8 +9,8 @@ import { LeaseLock } from './leaselock.js';
  * @typedef {import('./leaselock.js').LeaderElectionRecord} LeaderElectionRecord
  *
  * @typedef {Object} LeaderCallbacks
- * @property {() => void} onStartedLeading Called when the LeaderElector starts
- * leading.
+ * @property {(context: Context) => void} onStartedLeading Called when the
+ * LeaderElector starts leading.
  * @property {() => void} onStoppedLeading Called when the LeaderElector stops
  * leading. This is also called when the LeaderElector exits, even if it did
  * not start leading.
@@ -109,7 +109,7 @@ export class LeaderElector {
     }
 
     queueMicrotask(() => {
-      this.callbacks.onStartedLeading();
+      this.callbacks.onStartedLeading(ctx);
     });
     await this.#renew(ctx);
     queueMicrotask(() => {

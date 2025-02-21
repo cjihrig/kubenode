@@ -46,10 +46,10 @@ export default _default;
 export type LeaderElectionRecord = import("./leaselock.js").LeaderElectionRecord;
 export type LeaderCallbacks = {
     /**
-     * Called when the LeaderElector starts
-     * leading.
+     * Called when the
+     * LeaderElector starts leading.
      */
-    onStartedLeading: () => void;
+    onStartedLeading: (context: Context) => void;
     /**
      * Called when the LeaderElector stops
      * leading. This is also called when the LeaderElector exits, even if it did
