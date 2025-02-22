@@ -2,12 +2,14 @@ import { randomUUID } from 'node:crypto';
 import { hostname } from 'node:os';
 import {
   CoordinationV1Api,
+  CoreV1Api,
   KubeConfig,
   KubernetesObjectApi,
 } from '@kubernetes/client-node';
 import { Context } from './context.js';
 import { LeaderElector } from './leaderelection/leaderelection.js';
 import { LeaseLock } from './leaderelection/leaselock.js';
+import { EventRecorder } from './record/recorder.js';
 import { Server } from './webhook/server.js';
 
 /**
@@ -16,6 +18,7 @@ import { Server } from './webhook/server.js';
  * @typedef {Object} ManagerOptions
  * @property {KubeConfig} [kubeconfig] - Kubeconfig to use.
  * @property {CoordinationV1Api} [coordinationClient] - Coordination v1 API to use.
+ * @property {CoreV1Api} [coreClient] - Core v1 API to use.
  * @property {KubernetesObjectApi} [client] - Kubernetes client to use.
  * @property {boolean} [leaderElection] - Whether or not to use leader election
  * when starting the manager.
@@ -59,6 +62,7 @@ export class Manager {
     let {
       client,
       coordinationClient,
+      coreClient,
       kubeconfig,
       // TODO(cjihrig): Default this to true once the generated code is ready.
       leaderElection = false,
@@ -92,6 +96,12 @@ export class Manager {
       );
     }
 
+    if (coreClient === undefined) {
+      coreClient = kubeconfig.makeApiClient(CoreV1Api);
+    } else if (!(coreClient instanceof CoreV1Api)) {
+      throw new TypeError('options.coreClient must be a CoreV1Api instance');
+    }
+
     if (typeof leaderElection !== 'boolean') {
       throw new TypeError('options.leaderElection must be a boolean');
     }
@@ -121,11 +131,15 @@ export class Manager {
         name: leaderElectionName,
         namespace: leaderElectionNamespace
       };
-      const id = `${hostname()}_${randomUUID()}`;
+      const host = hostname();
+      const id = `${host}_${randomUUID()}`;
+      const eventSource = {
+        host,
+        component: 'manager',
+      };
       const lockConfig = {
         identity: id,
-        // TODO(cjihrig): Implement event recorder.
-        eventRecorder: null,
+        eventRecorder: new EventRecorder(eventSource, coreClient),
       };
       const electorOptions = {
         name: leaderElectionName,

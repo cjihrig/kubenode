@@ -2,6 +2,7 @@ import assert from 'node:assert';
 import { suite, test } from 'node:test';
 import {
   CoordinationV1Api,
+  CoreV1Api,
   KubeConfig,
   KubernetesObjectApi
 } from '@kubernetes/client-node';
@@ -23,6 +24,7 @@ function getManagerOptions() {
     kubeconfig,
     client: KubernetesObjectApi.makeApiClient(kubeconfig),
     coordinationClient: kubeconfig.makeApiClient(CoordinationV1Api),
+    coreClient: kubeconfig.makeApiClient(CoreV1Api),
     leaderElection: true,
     leaderElectionName: 'test-lock',
     leaderElectionNamespace: 'test-ns',
@@ -79,6 +81,15 @@ suite('Manager', () => {
       }, /TypeError: options.coordinationClient must be a CoordinationV1Api instance/);
     });
 
+    test('options.coreClient must be a CoreV1Api instance', () => {
+      const options = getManagerOptions();
+      options.coreClient = 'foo';
+
+      assert.throws(() => {
+        new Manager(options);
+      }, /TypeError: options.coreClient must be a CoreV1Api instance/);
+    });
+
     test('options.leaderElection must be a boolean', () => {
       const options = getManagerOptions();
       options.leaderElection = 'foo';
@@ -133,10 +144,11 @@ suite('Manager', () => {
       }, /TypeError: options.retryPeriod must be a number/);
     });
 
-    test('client and coordinationClient can be created from kubeconfig', () => {
+    test('clients can be created from kubeconfig', () => {
       const options = getManagerOptions();
       delete options.client;
       delete options.coordinationClient;
+      delete options.coreClient;
       const manager = new Manager(options);
       assert.strictEqual(manager instanceof Manager, true);
       assert.strictEqual(manager.started, false);

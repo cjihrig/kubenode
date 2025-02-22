@@ -43,6 +43,10 @@ export type ManagerOptions = {
      */
     coordinationClient?: CoordinationV1Api;
     /**
+     * - Core v1 API to use.
+     */
+    coreClient?: CoreV1Api;
+    /**
      * - Kubernetes client to use.
      */
     client?: KubernetesObjectApi;
@@ -83,3 +87,4 @@ import { KubeConfig } from '@kubernetes/client-node';
 import { Server } from './webhook/server.js';
 import { Context } from './context.js';
 import { CoordinationV1Api } from '@kubernetes/client-node';
+import { CoreV1Api } from '@kubernetes/client-node';
