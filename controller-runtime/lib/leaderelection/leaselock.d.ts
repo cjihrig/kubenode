@@ -58,6 +58,7 @@ export type KubernetesObject = import("@kubernetes/client-node").KubernetesObjec
 export type V1Lease = import("@kubernetes/client-node").V1Lease;
 export type V1MicroTime = import("@kubernetes/client-node").V1MicroTime;
 export type V1ObjectMeta = import("@kubernetes/client-node").V1ObjectMeta;
+export type EventRecorder = import("../record/recorder.js").EventRecorder;
 export type LeaderElectionRecord = {
     /**
      * The identity of the holder of a current
@@ -93,13 +94,6 @@ export type LeaderElectionRecord = {
      * lease has a more optimal holder and should be given up.
      */
     preferredHolder?: string;
-};
-export type recordEventFn = (object: KubernetesObject, eventType: string, reason: string, message: string) => void;
-export type EventRecorder = {
-    /**
-     * Called to record individual events.
-     */
-    event: recordEventFn;
 };
 export type ResourceLockConfig = {
     /**

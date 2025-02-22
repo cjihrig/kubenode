@@ -4,6 +4,7 @@
  * @typedef {import('@kubernetes/client-node').V1Lease} V1Lease
  * @typedef {import('@kubernetes/client-node').V1MicroTime} V1MicroTime
  * @typedef {import('@kubernetes/client-node').V1ObjectMeta} V1ObjectMeta
+ * @typedef {import('../record/recorder.js').EventRecorder} EventRecorder
  *
  * @typedef {Object} LeaderElectionRecord
  * @property {string} holderIdentity The identity of the holder of a current
@@ -19,11 +20,6 @@
  * coordinated leader election.
  * @property {string} [preferredHolder] Signals to a lease holder that the
  * lease has a more optimal holder and should be given up.
- *
- * @typedef {(object: KubernetesObject, eventType: string, reason: string, message: string) => void} recordEventFn
- *
- * @typedef {Object} EventRecorder
- * @property {recordEventFn} event Called to record individual events.
  *
  * @typedef {Object} ResourceLockConfig
  * @property {string} identity Unique string identifying a lease holder across
