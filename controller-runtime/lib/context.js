@@ -1,5 +1,8 @@
+import { withResolvers } from './util.js';
+
 /**
  * @typedef {import('@kubernetes/client-node').KubernetesObjectApi} KubernetesObjectApi
+ * @typedef {import('./util.js').PromiseWithResolvers} PromiseWithResolvers
  */
 
 const kConstructorKey = Symbol('constructorKey');
@@ -147,22 +150,6 @@ export class ReconcileContext extends Context {
   static fromContext(context, reconcileID, client) {
     return new ReconcileContext(kConstructorKey, context, reconcileID, client);
   }
-}
-
-/**
- * @typedef {Object} PromiseWithResolvers
- * @property {Promise} promise
- * @property {Function} resolve
- * @property {Function} reject
- */
-function withResolvers() {
-  let resolve;
-  let reject;
-  const promise = new Promise((res, rej) => {
-    resolve = res;
-    reject = rej;
-  });
-  return { promise, resolve, reject };
 }
 
 export default {

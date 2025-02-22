@@ -9,6 +9,7 @@ import {
   AdmissionReview,
   errored
 } from './admission.js';
+import { withResolvers } from '../util.js';
 
 /**
  * @typedef {import('node:http').RequestListener} RequestListener
@@ -281,27 +282,6 @@ function readAdmissionReview(req) {
   });
 
   return promise;
-}
-
-/**
- * @typedef {Object} PromiseWithResolvers
- * @property {Promise} promise
- * @property {Function} resolve
- * @property {Function} reject
- */
-
-/**
- * withResolvers() works like Promise.withResolvers().
- * @returns {PromiseWithResolvers}
- */
-function withResolvers() {
-  let resolve;
-  let reject;
-  const promise = new Promise((res, rej) => {
-    resolve = res;
-    reject = rej;
-  });
-  return { promise, resolve, reject };
 }
 
 export default { Server };

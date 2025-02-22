@@ -70,9 +70,5 @@ declare namespace _default {
     export { ReconcileContext };
 }
 export default _default;
-export type PromiseWithResolvers = {
-    promise: Promise<any>;
-    resolve: Function;
-    reject: Function;
-};
 export type KubernetesObjectApi = import("@kubernetes/client-node").KubernetesObjectApi;
+export type PromiseWithResolvers = import("./util.js").PromiseWithResolvers;

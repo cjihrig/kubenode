@@ -2,20 +2,11 @@ import assert from 'node:assert';
 import { suite, test } from 'node:test';
 import { Context } from '../../lib/context.js';
 import { LeaderElector } from '../../lib/leaderelection/leaderelection.js';
+import { withResolvers } from '../../lib/util.js';
 import {
   createNotFoundError,
   getLeaseLock,
 } from './test-utils.js';
-
-function withResolvers() {
-  let resolve;
-  let reject;
-  const promise = new Promise((res, rej) => {
-    resolve = res;
-    reject = rej;
-  });
-  return { promise, resolve, reject };
-}
 
 function getLeaderElectorOptions(mock) {
   return {

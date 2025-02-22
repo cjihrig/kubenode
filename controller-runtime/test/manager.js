@@ -7,16 +7,7 @@ import {
 } from '@kubernetes/client-node';
 import { Manager } from '../lib/manager.js';
 import { Context } from '../lib/context.js';
-
-function withResolvers() {
-  let resolve;
-  let reject;
-  const promise = new Promise((res, rej) => {
-    resolve = res;
-    reject = rej;
-  });
-  return { promise, resolve, reject };
-}
+import { withResolvers } from '../lib/util.js';
 
 function getManagerOptions() {
   const kubeconfig = new KubeConfig();

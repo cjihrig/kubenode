@@ -45,11 +45,6 @@ declare namespace _default {
     export { Server };
 }
 export default _default;
-export type PromiseWithResolvers = {
-    promise: Promise<any>;
-    resolve: Function;
-    reject: Function;
-};
 export type RequestListener = import("node:http").RequestListener;
 export type IncomingMessage = import("node:http").IncomingMessage;
 export type ServerResponse = import("node:http").ServerResponse;
