@@ -89,7 +89,7 @@ export function removeFinalizer(o, finalizer) {
  * @returns {boolean}
  */
 export function hasOwnerReference(ownerRefs, o) {
-  const gvk = getObjectGVK(o);
+  const gvk = GroupVersionKind.fromKubernetesObject(o);
   /** @type {V1OwnerReference} */
   // @ts-expect-error ref is only a partial type.
   const ref = {
@@ -110,7 +110,7 @@ export function hasOwnerReference(ownerRefs, o) {
  */
 export function setOwnerReference(owner, object) {
   validateOwner(owner, object);
-  const gvk = getObjectGVK(owner);
+  const gvk = GroupVersionKind.fromKubernetesObject(owner);
   /** @type {V1OwnerReference} */
   const ref = {
     apiVersion: gvk.toAPIVersion(),
@@ -137,7 +137,7 @@ export function setOwnerReference(owner, object) {
  * @param {KubernetesObject} object - Kubernetes object that is owned.
  */
 export function removeOwnerReference(owner, object) {
-  const gvk = getObjectGVK(owner);
+  const gvk = GroupVersionKind.fromKubernetesObject(owner);
   /** @type {V1OwnerReference} */
   // @ts-expect-error ref is only a partial type.
   const ref = {
@@ -174,7 +174,7 @@ export function hasControllerReference(o) {
  */
 export function setControllerReference(owner, object) {
   validateOwner(owner, object);
-  const gvk = getObjectGVK(owner);
+  const gvk = GroupVersionKind.fromKubernetesObject(owner);
   /** @type {V1OwnerReference} */
   const ref = {
     apiVersion: gvk.toAPIVersion(),
@@ -288,25 +288,6 @@ function validateOwner(owner, object) {
       `object's namespace is '${objectNs}'`;
     throw new Error(msg);
   }
-}
-
-/**
- * getObjectGVK() returns the GroupVersionKind of the provided object.
- * @param {KubernetesObject} object - Kubernetes object.
- * @returns {GroupVersionKind}
- */
-function getObjectGVK(object) {
-  // TODO(cjihrig): This function as not as thorough as the Go function:
-  // GVKForObject from sigs.k8s.io/controller-runtime/pkg/client/apiutil
-  if (!object.kind) {
-    throw new Error('object has no kind');
-  }
-
-  if (!object.apiVersion) {
-    throw new Error('object has no version');
-  }
-
-  return GroupVersionKind.fromAPIVersionAndKind(object.apiVersion, object.kind);
 }
 
 /**

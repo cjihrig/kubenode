@@ -93,7 +93,7 @@ export class EventRecorder {
  * @returns {V1ObjectReference}
  */
 function getReference(object) {
-  const gvk = getObjectGVK(object);
+  const gvk = GroupVersionKind.fromKubernetesObject(object);
   return {
     apiVersion: gvk.toAPIVersion(),
     kind: gvk.kind,
@@ -102,24 +102,6 @@ function getReference(object) {
     resourceVersion: object.metadata?.resourceVersion,
     uid: object.metadata?.uid,
   };
-}
-
-// TODO(cjihrig): This is duplicated from controllerutil
-/**
- * getObjectGVK() returns the GroupVersionKind of the provided object.
- * @param {KubernetesObject} object - Kubernetes object.
- * @returns {GroupVersionKind}
- */
-function getObjectGVK(object) {
-  if (!object.kind) {
-    throw new Error('object has no kind');
-  }
-
-  if (!object.apiVersion) {
-    throw new Error('object has no version');
-  }
-
-  return GroupVersionKind.fromAPIVersionAndKind(object.apiVersion, object.kind);
 }
 
 export default {

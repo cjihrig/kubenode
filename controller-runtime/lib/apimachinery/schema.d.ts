@@ -1,4 +1,7 @@
 /**
+ * @typedef {import('@kubernetes/client-node').KubernetesObject} KubernetesObject
+ */
+/**
  * GroupVersionResource unambiguously identifies a resource.
  */
 export class GroupVersionResource {
@@ -25,6 +28,13 @@ export class GroupVersionKind {
      * @returns {GroupVersionKind}
      */
     static fromAPIVersionAndKind(apiVersion: string, kind: string): GroupVersionKind;
+    /**
+     * fromKubernetesObject() returns a GroupVersionKind based on the provided
+     * object.
+     * @param {KubernetesObject} object - Kubernetes object.
+     * @returns {GroupVersionKind}
+     */
+    static fromKubernetesObject(object: KubernetesObject): GroupVersionKind;
     /**
      * Construct a GroupVersionKind.
      * @param {string} group - Resource group.
@@ -151,3 +161,4 @@ declare namespace _default {
     export { GroupVersionResource };
 }
 export default _default;
+export type KubernetesObject = import("@kubernetes/client-node").KubernetesObject;

@@ -160,6 +160,25 @@ suite('GroupVersionKind', () => {
       GroupVersionKind.fromAPIVersionAndKind('//', 'Book');
     }, /unexpected GroupVersion string/);
   });
+
+  test('GroupVersionKind.fromKubernetesObject()', () => {
+    const gvk = GroupVersionKind.fromKubernetesObject({
+      apiVersion: 'v1',
+      kind: 'Foo'
+    });
+    assert.strictEqual(gvk instanceof GroupVersionKind, true);
+    assert.strictEqual(gvk.group, '');
+    assert.strictEqual(gvk.version, 'v1');
+    assert.strictEqual(gvk.kind, 'Foo');
+
+    assert.throws(() => {
+      GroupVersionKind.fromKubernetesObject({ kind: 'Foo' });
+    }, /object has no version/);
+
+    assert.throws(() => {
+      GroupVersionKind.fromKubernetesObject({ apiVersion: 'v1' });
+    }, /object has no kind/);
+  });
 });
 
 test('GroupVersionResource() constructor', () => {

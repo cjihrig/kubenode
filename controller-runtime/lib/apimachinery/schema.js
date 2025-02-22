@@ -1,4 +1,8 @@
 /**
+ * @typedef {import('@kubernetes/client-node').KubernetesObject} KubernetesObject
+ */
+
+/**
  * GroupVersionResource unambiguously identifies a resource.
  */
 export class GroupVersionResource {
@@ -49,6 +53,24 @@ export class GroupVersionKind {
   static fromAPIVersionAndKind(apiVersion, kind) {
     const gv = GroupVersion.fromString(apiVersion);
     return new GroupVersionKind(gv.group, gv.version, kind);
+  }
+
+  /**
+   * fromKubernetesObject() returns a GroupVersionKind based on the provided
+   * object.
+   * @param {KubernetesObject} object - Kubernetes object.
+   * @returns {GroupVersionKind}
+   */
+  static fromKubernetesObject(object) {
+    if (!object.kind) {
+      throw new Error('object has no kind');
+    }
+
+    if (!object.apiVersion) {
+      throw new Error('object has no version');
+    }
+
+    return this.fromAPIVersionAndKind(object.apiVersion, object.kind);
   }
 }
 
