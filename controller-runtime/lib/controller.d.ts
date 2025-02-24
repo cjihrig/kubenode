@@ -1,6 +1,5 @@
 /**
  * @typedef {import('./context.js').Context} Context
- * @typedef {import('./manager.js').Manager} Manager
  * @typedef {import('./reconcile.js').Request} Request
  * @typedef {import('./reconcile.js').Reconciler} Reconciler
  * @typedef {import('./source.js').Source} Source
@@ -15,10 +14,9 @@ export class Controller {
     /**
      * Construct a Controller.
      * @param {string} name - Controller name.
-     * @param {Manager} manager - The manager in charge of this controller.
      * @param {ControllerOptions} [options] - Configuration options.
      */
-    constructor(name: string, manager: Manager, options?: ControllerOptions);
+    constructor(name: string, options?: ControllerOptions);
     context: import("./context.js").Context;
     name: string;
     queue: Queue;
@@ -50,7 +48,6 @@ declare namespace _default {
 }
 export default _default;
 export type Context = import("./context.js").Context;
-export type Manager = import("./manager.js").Manager;
 export type Request = import("./reconcile.js").Request;
 export type Reconciler = import("./reconcile.js").Reconciler;
 export type Source = import("./source.js").Source;

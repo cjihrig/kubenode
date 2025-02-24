@@ -16,7 +16,8 @@ export class Builder {
     }
 
     const ctrlName = this.#getControllerName();
-    const controller = new Controller(ctrlName, this.manager, { reconciler });
+    const controller = new Controller(ctrlName, { reconciler });
+    this.manager.add(controller);
     this.#setupControllerWatches(controller);
     return controller;
   }

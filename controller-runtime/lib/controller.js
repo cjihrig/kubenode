@@ -5,7 +5,6 @@ import { Queue } from './queue.js';
 
 /**
  * @typedef {import('./context.js').Context} Context
- * @typedef {import('./manager.js').Manager} Manager
  * @typedef {import('./reconcile.js').Request} Request
  * @typedef {import('./reconcile.js').Reconciler} Reconciler
  * @typedef {import('./source.js').Source} Source
@@ -21,10 +20,9 @@ export class Controller {
   /**
    * Construct a Controller.
    * @param {string} name - Controller name.
-   * @param {Manager} manager - The manager in charge of this controller.
    * @param {ControllerOptions} [options] - Configuration options.
    */
-  constructor(name, manager, options) {
+  constructor(name, options) {
     const {
       reconciler = null
     } = options;
@@ -36,8 +34,6 @@ export class Controller {
     this.started = false;
     /** @type Source[] */
     this.startWatches = [];
-    // @ts-ignore 'this' is not a Controller?
-    manager.add(this);
   }
 
   /**
