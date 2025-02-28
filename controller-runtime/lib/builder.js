@@ -67,7 +67,7 @@ export class Builder {
    * Controller to respond to events by reconciling.
    * @param {string} kind - The resource kind
    * @param {string} apiVersion - The resource API version.
-   * @returns {Builder}
+   * @returns {this}
    */
   for(kind, apiVersion) {
     if (this.#forInput !== null) {
@@ -83,7 +83,7 @@ export class Builder {
    * up in metrics, among other things, and thus should be a Prometheus
    * compatible name (underscores and alphanumeric characters only).
    * @param {string} name - The name of the Controller.
-   * @returns {Builder}
+   * @returns {this}
    */
   named(name) {
     this.#name = name;
@@ -96,7 +96,7 @@ export class Builder {
    * object.
    * @param {string} kind - The resource kind
    * @param {string} apiVersion - The resource API version.
-   * @returns {Builder}
+   * @returns {this}
    */
   owns(kind, apiVersion) {
     this.#ownsInput.push({ kind, apiVersion });
@@ -105,7 +105,7 @@ export class Builder {
 
   /**
    * watches() This method is incomplete.
-   * @returns {Builder}
+   * @returns {this}
    */
   watches() {
     // TODO(cjihrig): Implement this.
