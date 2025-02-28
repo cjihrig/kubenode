@@ -1,7 +1,6 @@
 /**
  * @typedef {import('./context.js').Context} Context
  * @typedef {import('./reconcile.js').Request} Request
- * @typedef {import('./reconcile.js').Reconciler} Reconciler
  * @typedef {import('./source.js').Source} Source
  *
  * @typedef {Object} ControllerOptions
@@ -17,13 +16,11 @@ export class Controller {
      * @param {ControllerOptions} [options] - Configuration options.
      */
     constructor(name: string, options?: ControllerOptions);
-    context: import("./context.js").Context;
-    name: string;
-    queue: Queue;
-    reconciler: import("./reconcile.js").Reconciler;
-    started: boolean;
-    /** @type Source[] */
-    startWatches: Source[];
+    /**
+     * The controller name.
+     * @type {string}
+     */
+    get name(): string;
     /**
      * reconcile() invokes the controller's reconciler for a specific resource.
      * @param {Context} context - Context to use.
@@ -37,6 +34,11 @@ export class Controller {
      */
     start(context: Context): void;
     /**
+     * A boolean indicating if the controller was started.
+     * @type {boolean}
+     */
+    get started(): boolean;
+    /**
      * watch() begins watching a Source for events.
      * @param {Source} source - Source to watch for events.
      */
@@ -49,7 +51,6 @@ declare namespace _default {
 export default _default;
 export type Context = import("./context.js").Context;
 export type Request = import("./reconcile.js").Request;
-export type Reconciler = import("./reconcile.js").Reconciler;
 export type Source = import("./source.js").Source;
 export type ControllerOptions = {
     /**
@@ -57,5 +58,5 @@ export type ControllerOptions = {
      */
     reconciler: Reconciler;
 };
-import { Queue } from './queue.js';
 import { Result } from './reconcile.js';
+import { Reconciler } from './reconcile.js';
