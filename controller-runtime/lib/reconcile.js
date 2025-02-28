@@ -40,6 +40,7 @@ export class TerminalError extends Error {
    */
   constructor(cause) {
     super('terminal error', { cause });
+    this.name = 'TerminalError';
   }
 }
 
