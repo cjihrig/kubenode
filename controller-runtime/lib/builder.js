@@ -99,8 +99,10 @@ export class Builder {
    * @returns {this}
    */
   owns(kind, apiVersion) {
-    this.#ownsInput.push({ kind, apiVersion });
-    return this;
+    // TODO(cjihrig): Implement this.
+    throw new Error('unimplemented');
+    // this.#ownsInput.push({ kind, apiVersion });
+    // return this;
   }
 
   /**
@@ -110,7 +112,7 @@ export class Builder {
   watches() {
     // TODO(cjihrig): Implement this.
     throw new Error('unimplemented');
-    return this;
+    // return this;
   }
 
   /**
