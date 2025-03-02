@@ -204,11 +204,11 @@ export class Manager {
 
     // Webhooks can start before leader election.
     if (this.#webhookServer !== null) {
-      await this.#webhookServer.start(context);
+      await this.#webhookServer.start(context.child());
     }
 
     if (this.#leaderElector !== null) {
-      this.#leaderElector.run(context);
+      this.#leaderElector.run(context.child());
     } else {
       this.#startControllers(context);
     }
@@ -221,7 +221,7 @@ export class Manager {
    */
   #startControllers(ctx) {
     for (let i = 0; i < this.#controllers.length; ++i) {
-      this.#controllers[i].start(ctx);
+      this.#controllers[i].start(ctx.child());
     }
   }
 }
