@@ -8,6 +8,7 @@ import { Request } from './reconcile.js';
 /**
  * @typedef {import('@kubernetes/client-node').KubernetesObject} KubernetesObject
  * @typedef {import('./context.js').Context} Context
+ * @typedef {import('./queue.js').Queue<Request>} Queue<Request>
  */
 
 /**
@@ -48,7 +49,7 @@ export class Source {
   /**
    * start() causes the Source to start watching for and reporting events.
    * @param {Context} context - Context to use.
-   * @param {Object} queue - Queue to insert observed events into.
+   * @param {Queue} queue - Queue to insert observed events into.
    * @returns {Promise<void>}
    */
   async start(context, queue) {

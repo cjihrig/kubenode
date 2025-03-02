@@ -20,7 +20,7 @@ export class Controller {
   #context;
   /** @type string */
   #name;
-  /** @type Queue */
+  /** @type Queue<Request> */
   #queue;
   /** @type Reconciler */
   #reconciler;
