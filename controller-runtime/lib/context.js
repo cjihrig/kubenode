@@ -6,6 +6,7 @@ import { withResolvers } from './util.js';
  */
 
 const kConstructorKey = Symbol('constructorKey');
+const noop = () => {};
 
 /**
  * Context carries deadlines, cancellation signals, and other values across API
@@ -47,6 +48,9 @@ export class Context {
         this.#parent.#signal,
       ]);
     }
+
+    // Prevent unhandledRejections on aborts.
+    this.#promise.promise.catch(noop);
 
     this.#signal.addEventListener('abort', () => {
       if (this.#settled) {

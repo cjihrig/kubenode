@@ -69,6 +69,16 @@ suite('Context', () => {
       assert.strictEqual(parent.signal.aborted, false);
       await assert.rejects(child.done);
     });
+
+    test('does not cause unhandledRejections', () => {
+      const ctx = Context.create();
+
+      assert.strictEqual(ctx.signal.aborted, false);
+      ctx.cancel();
+      assert.strictEqual(ctx.signal.aborted, true);
+      // At this point, the test would complete and an unhandledRejection would
+      // occur if we weren't handling this properly in the context.
+    });
   });
 });
 
