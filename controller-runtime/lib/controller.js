@@ -137,10 +137,7 @@ export class Controller {
    * @returns {Promise<void>}
    */
   async #reconcileHandler(context, request) {
-    const ctx = ReconcileContext.fromContext(
-      // TODO(cjihrig): Provide a client as the third argument here.
-      context.child(), randomUUID(), null
-    );
+    const ctx = ReconcileContext.fromContext(context.child(), randomUUID());
     let result;
 
     try {

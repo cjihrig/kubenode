@@ -47,18 +47,15 @@ export class ReconcileContext extends Context {
      * ReconcileContext.fromContext() creates a new ReconcileContext object.
      * @param {Context} context - Parent context.
      * @param {string} reconcileID - Unique ID for the reconciliation.
-     * @param {KubernetesObjectApi} client - Kubernetes client.
      * @returns {ReconcileContext}
      */
-    static fromContext(context: Context, reconcileID: string, client: KubernetesObjectApi): ReconcileContext;
+    static fromContext(context: Context, reconcileID: string): ReconcileContext;
     /**
      * Construct a ReconcileContext.
      */
-    constructor(key: any, parent: any, reconcileID: any, client: any);
+    constructor(key: any, parent: any, reconcileID: any);
     /** @type string */
     reconcileID: string;
-    /** @type KubernetesObjectApi */
-    client: KubernetesObjectApi;
     /**
      * child() derives a child ReconcileContext from the current ReconcileContext.
      * @returns {ReconcileContext}
@@ -70,5 +67,4 @@ declare namespace _default {
     export { ReconcileContext };
 }
 export default _default;
-export type KubernetesObjectApi = import("@kubernetes/client-node").KubernetesObjectApi;
 export type PromiseWithResolvers = import("./util.js").PromiseWithResolvers;

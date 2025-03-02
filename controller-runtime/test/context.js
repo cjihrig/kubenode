@@ -94,8 +94,7 @@ suite('ReconcileContext', () => {
   suite('ReconcileContext.fromContext()', () => {
     test('creates a new ReconcileContext instance', () => {
       const parent = Context.create();
-      const client = {};
-      const rc = ReconcileContext.fromContext(parent, 'foobar', client);
+      const rc = ReconcileContext.fromContext(parent, 'foobar');
 
       assert.strictEqual(rc instanceof Context, true);
       assert.strictEqual(rc instanceof ReconcileContext, true);
@@ -103,15 +102,13 @@ suite('ReconcileContext', () => {
       assert.strictEqual(rc.signal instanceof AbortSignal, true);
       assert.strictEqual(rc.values instanceof Map, true);
       assert.strictEqual(rc.reconcileID, 'foobar');
-      assert.strictEqual(rc.client, client);
     });
   });
 
   suite('ReconcileContext.prototype.child()', () => {
     test('creates a child ReconcileContext', () => {
       const parent = Context.create();
-      const client = {};
-      const rcParent = ReconcileContext.fromContext(parent, 'foobar', client);
+      const rcParent = ReconcileContext.fromContext(parent, 'foobar');
       const rcChild = rcParent.child();
 
       assert.strictEqual(rcChild instanceof Context, true);
@@ -119,7 +116,6 @@ suite('ReconcileContext', () => {
       assert.strictEqual(rcChild.signal instanceof AbortSignal, true);
       assert.strictEqual(rcChild.values instanceof Map, true);
       assert.strictEqual(rcChild.reconcileID, rcParent.reconcileID);
-      assert.strictEqual(rcChild.client, rcParent.client);
       assert.notStrictEqual(rcChild.done, parent.done);
       assert.notStrictEqual(rcChild.signal, parent.signal);
       assert.notStrictEqual(rcChild.values, parent.values);

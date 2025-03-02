@@ -1,7 +1,6 @@
 import { withResolvers } from './util.js';
 
 /**
- * @typedef {import('@kubernetes/client-node').KubernetesObjectApi} KubernetesObjectApi
  * @typedef {import('./util.js').PromiseWithResolvers} PromiseWithResolvers
  */
 
@@ -126,12 +125,10 @@ export class ReconcileContext extends Context {
   /**
    * Construct a ReconcileContext.
    */
-  constructor(key, parent, reconcileID, client) {
+  constructor(key, parent, reconcileID) {
     super(key, parent);
     /** @type string */
     this.reconcileID = reconcileID;
-    /** @type KubernetesObjectApi */
-    this.client = client;
   }
 
   /**
@@ -139,20 +136,17 @@ export class ReconcileContext extends Context {
    * @returns {ReconcileContext}
    */
   child() {
-    return new ReconcileContext(
-      kConstructorKey, this, this.reconcileID, this.client
-    );
+    return new ReconcileContext(kConstructorKey, this, this.reconcileID);
   }
 
   /**
    * ReconcileContext.fromContext() creates a new ReconcileContext object.
    * @param {Context} context - Parent context.
    * @param {string} reconcileID - Unique ID for the reconciliation.
-   * @param {KubernetesObjectApi} client - Kubernetes client.
    * @returns {ReconcileContext}
    */
-  static fromContext(context, reconcileID, client) {
-    return new ReconcileContext(kConstructorKey, context, reconcileID, client);
+  static fromContext(context, reconcileID) {
+    return new ReconcileContext(kConstructorKey, context, reconcileID);
   }
 }
 
