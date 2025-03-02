@@ -74,7 +74,9 @@ export class Controller {
    * @returns {Promise<Result>}
    */
   reconcile(context, request) {
-    return this.#reconciler.reconcile(context, request);
+    const ctx = ReconcileContext.fromContext(context, randomUUID());
+
+    return this.#reconciler.reconcile(ctx, request);
   }
 
   /**
@@ -102,7 +104,7 @@ export class Controller {
       const source = this.#startWatches[i];
       // TODO(cjihrig): Probably need to implement
       // Source.prototype.waitForSync() and call that here instead.
-      source.start(this.#context, this.#queue);
+      source.start(this.#context.child(), this.#queue);
     }
 
     this.#startWatches = [];
@@ -126,7 +128,7 @@ export class Controller {
       return;
     }
 
-    source.start(this.#context, this.#queue);
+    source.start(this.#context.child(), this.#queue);
   }
 
   /**
@@ -137,11 +139,10 @@ export class Controller {
    * @returns {Promise<void>}
    */
   async #reconcileHandler(context, request) {
-    const ctx = ReconcileContext.fromContext(context.child(), randomUUID());
     let result;
 
     try {
-      result = await this.reconcile(ctx, request);
+      result = await this.reconcile(context, request);
 
       if (!(result instanceof Result)) {
         result = new Result(result);

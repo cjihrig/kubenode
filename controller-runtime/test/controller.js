@@ -1,6 +1,6 @@
 import assert from 'node:assert';
 import { suite, test } from 'node:test';
-import { Context } from '../lib/context.js';
+import { Context, ReconcileContext } from '../lib/context.js';
 import { Controller } from '../lib/controller.js';
 import { Queue } from '../lib/queue.js';
 import { Reconciler, Request, TerminalError } from '../lib/reconcile.js';
@@ -65,13 +65,17 @@ suite('Controller', () => {
       t.mock.method(TestReconciler.prototype, 'reconcile');
       const reconciler = new TestReconciler();
       const controller = new Controller('foo', { reconciler });
+      const ctx = Context.create();
+      const req = new Request('bar', 'baz');
 
-      assert.strictEqual(controller.reconcile('ctx', 'req'), false);
+      assert.strictEqual(controller.reconcile(ctx, req), false);
       const calls = reconciler.reconcile.mock.calls;
       assert.strictEqual(calls.length, 1);
       assert.strictEqual(calls[0].arguments.length, 2);
-      assert.strictEqual(calls[0].arguments[0], 'ctx');
-      assert.strictEqual(calls[0].arguments[1], 'req');
+      assert.strictEqual(
+        calls[0].arguments[0] instanceof ReconcileContext, true
+      );
+      assert.strictEqual(calls[0].arguments[1], req);
     });
   });
 
