@@ -1,5 +1,6 @@
 import assert from 'node:assert';
 import { test } from 'node:test';
+import { Context } from '../../lib/context.js';
 import admission from '../../lib/webhook/admission.js';
 import { Server } from '../../lib/webhook/server.js';
 
@@ -60,7 +61,7 @@ test('Server.p.inject() injects a request', async () => {
   const s = new Server({ insecure: true });
 
   s.register('/foo', (ctx, req) => {
-    assert.strictEqual(ctx, null);
+    assert.strictEqual(ctx instanceof Context, true);
     assert(req instanceof admission.AdmissionRequest);
     assert.strictEqual(req.uid, 'foobar');
     return admission.denied('test-deny');

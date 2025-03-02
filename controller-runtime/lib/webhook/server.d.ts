@@ -15,7 +15,7 @@ export class Server {
      * @param {ServerOptions} [options] Options used to construct instance.
      */
     constructor(options?: ServerOptions);
-    context: import("../context.js").Context;
+    context: Context;
     port: number;
     /** @type RequestListener */
     requestHandler: RequestListener;
@@ -48,7 +48,6 @@ export default _default;
 export type RequestListener = import("node:http").RequestListener;
 export type IncomingMessage = import("node:http").IncomingMessage;
 export type ServerResponse = import("node:http").ServerResponse;
-export type Context = import("../context.js").Context;
 export type ServerOptions = {
     /**
      * The directory that contains the server key and certificate.
@@ -71,3 +70,4 @@ export type ServerOptions = {
      */
     port?: number;
 };
+import { Context } from '../context.js';

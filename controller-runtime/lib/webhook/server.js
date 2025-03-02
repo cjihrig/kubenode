@@ -9,13 +9,13 @@ import {
   AdmissionReview,
   errored
 } from './admission.js';
+import { Context } from '../context.js';
 import { withResolvers } from '../util.js';
 
 /**
  * @typedef {import('node:http').RequestListener} RequestListener
  * @typedef {import('node:http').IncomingMessage} IncomingMessage
  * @typedef {import('node:http').ServerResponse} ServerResponse
- * @typedef {import('../context.js').Context} Context
  */
 
 const kContentTypeHeader = 'content-type';
@@ -197,6 +197,7 @@ export class Server {
 
 /**
  * requestHandler() handles an individual HTTP request.
+ * @this {Server}
  * @param {IncomingMessage} req The HTTP request object.
  * @param {ServerResponse} res The HTTP response object.
  * @returns {Promise<void>}
@@ -222,7 +223,8 @@ async function requestHandler(req, res) {
   }
 
   try {
-    let response = hook(this.context, review.request);
+    const ctx = this.context ? this.context.child() : Context.create();
+    let response = hook(ctx, review.request);
 
     if (!(response instanceof AdmissionResponse)) {
       response = new AdmissionResponse(response);
