@@ -146,6 +146,14 @@ export class ReconcileContext extends Context {
    * @returns {ReconcileContext}
    */
   static fromContext(context, reconcileID) {
+    if (!(context instanceof Context)) {
+      throw new TypeError('context must be a Context instance');
+    }
+
+    if (typeof reconcileID !== 'string') {
+      throw new TypeError('reconcileID must be a string');
+    }
+
     return new ReconcileContext(kConstructorKey, context, reconcileID);
   }
 }

@@ -103,6 +103,18 @@ suite('ReconcileContext', () => {
       assert.strictEqual(rc.values instanceof Map, true);
       assert.strictEqual(rc.reconcileID, 'foobar');
     });
+
+    test('throws if context is not a Context instance', () => {
+      assert.throws(() => {
+        ReconcileContext.fromContext({}, 'foobar');
+      }, /TypeError: context must be a Context instance/);
+    });
+
+    test('throws if reconcileID is not a string', () => {
+      assert.throws(() => {
+        ReconcileContext.fromContext(Context.create(), 5);
+      }, /TypeError: reconcileID must be a string/);
+    });
   });
 
   suite('ReconcileContext.prototype.child()', () => {
