@@ -1,7 +1,5 @@
 /**
  * @typedef {import('@kubernetes/client-node').KubernetesObject} KubernetesObject
- * @typedef {import('./context.js').Context} Context
- * @typedef {import('./queue.js').Queue<Request>} Queue<Request>
  */
 /**
  * Source provides event streams to hook up to Controllers.
@@ -23,21 +21,18 @@ export class Source {
     /**
      * start() causes the Source to start watching for and reporting events.
      * @param {Context} context - Context to use.
-     * @param {Queue} queue - Queue to insert observed events into.
+     * @param {Queue<Request>} queue - Queue to insert observed events into.
      * @returns {Promise<void>}
      */
-    start(context: Context, queue: Queue): Promise<void>;
+    start(context: Context, queue: Queue<Request>): Promise<void>;
 }
 declare namespace _default {
     export { Source };
 }
 export default _default;
 export type KubernetesObject = import("@kubernetes/client-node").KubernetesObject;
-export type Context = import("./context.js").Context;
-/**
- * <Request>
- */
-export type Queue = import("./queue.js").Queue<Request>;
 import { KubeConfig } from '@kubernetes/client-node';
 import { KubernetesObjectApi } from '@kubernetes/client-node';
+import { Context } from './context.js';
+import { Queue } from './queue.js';
 import { Request } from './reconcile.js';

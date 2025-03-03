@@ -3,12 +3,12 @@ import {
   KubernetesObjectApi,
   makeInformer,
 } from '@kubernetes/client-node';
+import { Context } from './context.js';
+import { Queue } from './queue.js';
 import { Request } from './reconcile.js';
 
 /**
  * @typedef {import('@kubernetes/client-node').KubernetesObject} KubernetesObject
- * @typedef {import('./context.js').Context} Context
- * @typedef {import('./queue.js').Queue<Request>} Queue<Request>
  */
 
 /**
@@ -49,10 +49,18 @@ export class Source {
   /**
    * start() causes the Source to start watching for and reporting events.
    * @param {Context} context - Context to use.
-   * @param {Queue} queue - Queue to insert observed events into.
+   * @param {Queue<Request>} queue - Queue to insert observed events into.
    * @returns {Promise<void>}
    */
   async start(context, queue) {
+    if (!(context instanceof Context)) {
+      throw new TypeError('context must be a Context instance');
+    }
+
+    if (!(queue instanceof Queue)) {
+      throw new TypeError('queue must be a Queue instance');
+    }
+
     let apiVersion = this.apiVersion;
 
     if (apiVersion !== 'v1' && apiVersion.split('/').length === 1) {

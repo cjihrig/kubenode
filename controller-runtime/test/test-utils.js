@@ -29,6 +29,25 @@ export function getManagerOptions() {
   };
 }
 
+export function getSourceOptions() {
+  const kubeconfig = new KubeConfig();
+  const kcOptions = {
+    clusters: [{ name: 'cluster', server: 'https://127.0.0.1:51010' }],
+    users: [{ name: 'user', password: 'password' }],
+    contexts: [{ name: 'currentContext', cluster: 'cluster', user: 'user' }],
+    currentContext: 'currentContext',
+  };
+  kubeconfig.loadFromOptions(kcOptions);
+
+  return {
+    kubeconfig,
+    client: KubernetesObjectApi.makeApiClient(kubeconfig),
+    kind: 'Foo',
+    apiVersion: 'bar.com/v1',
+  };
+}
+
 export default {
   getManagerOptions,
+  getSourceOptions,
 }
