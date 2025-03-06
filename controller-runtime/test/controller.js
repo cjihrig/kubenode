@@ -23,6 +23,7 @@ class TestSource {
     this.context = context;
     this.queue = queue;
   }
+  async stop() {}
 }
 
 suite('Controller', () => {
@@ -116,6 +117,63 @@ suite('Controller', () => {
       assert.strictEqual(calls[0].arguments.length, 2);
       assert.strictEqual(calls[0].arguments[0] instanceof Context, true);
       assert.strictEqual(calls[0].arguments[1] instanceof Queue, true);
+    });
+  });
+
+  suite('Controller.prototype.stop()', () => {
+    test('sets started to false after stopping', async () => {
+      const reconciler = new TestReconciler();
+      const controller = new Controller('foo', { reconciler });
+
+      assert.strictEqual(controller.started, false);
+      assert.strictEqual(controller.start(Context.create()), undefined);
+      assert.strictEqual(controller.started, true);
+      assert.strictEqual(await controller.stop(), undefined);
+      assert.strictEqual(controller.started, false);
+    });
+
+    test('is a no-op if the controller is already stopped', async () => {
+      const reconciler = new TestReconciler();
+      const controller = new Controller('foo', { reconciler });
+
+      assert.strictEqual(controller.started, false);
+      assert.strictEqual(await controller.stop(), undefined);
+      assert.strictEqual(controller.started, false);
+      assert.strictEqual(await controller.stop(), undefined);
+      assert.strictEqual(controller.started, false);
+      assert.strictEqual(await controller.stop(), undefined);
+    });
+
+    test('sources are stopped when controller is stopped', async (t) => {
+      t.mock.method(TestSource.prototype, 'stop');
+      const ctx = Context.create();
+      const source = new TestSource();
+      const reconciler = new TestReconciler();
+      const controller = new Controller('foo', { reconciler });
+
+      controller.watch(source);
+      controller.start(ctx);
+      assert.strictEqual(source.stop.mock.callCount(), 0);
+      await controller.stop();
+      assert.strictEqual(source.stop.mock.callCount(), 1);
+    });
+
+    test('is invoked when the context is cancelled', async (t) => {
+      t.mock.method(Controller.prototype, 'stop');
+      t.mock.method(TestSource.prototype, 'stop');
+      const ctx = Context.create();
+      const source = new TestSource();
+      const reconciler = new TestReconciler();
+      const controller = new Controller('foo', { reconciler });
+
+      controller.watch(source);
+      controller.start(ctx);
+      assert.strictEqual(controller.stop.mock.callCount(), 0);
+      assert.strictEqual(source.stop.mock.callCount(), 0);
+      ctx.cancel();
+      await assert.rejects(ctx.done);
+      assert.strictEqual(controller.stop.mock.callCount(), 1);
+      assert.strictEqual(source.stop.mock.callCount(), 1);
     });
   });
 

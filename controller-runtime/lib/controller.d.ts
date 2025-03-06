@@ -39,6 +39,12 @@ export class Controller {
      */
     get started(): boolean;
     /**
+     * stop() causes the controller to stop consuming events. If the controller
+     * was already stopped, this is a no-op.
+     * @returns {Promise<void>}
+     */
+    stop(): Promise<void>;
+    /**
      * watch() begins watching a Source for events.
      * @param {Source} source - Source to watch for events.
      */

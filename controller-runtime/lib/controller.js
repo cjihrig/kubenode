@@ -24,6 +24,8 @@ export class Controller {
   #queue;
   /** @type Reconciler */
   #reconciler;
+  /** @type Source[] */
+  #sources;
   /** @type boolean */
   #started;
   /** @type Source[] */
@@ -55,6 +57,7 @@ export class Controller {
     this.#name = name;
     this.#queue = new Queue();
     this.#reconciler = reconciler;
+    this.#sources = [];
     this.#started = false;
     this.#startWatches = [];
   }
@@ -100,10 +103,15 @@ export class Controller {
       this.#reconcileHandler(context, data.data);
     });
 
+    context.signal.addEventListener('abort', () => {
+      this.stop();
+    });
+
     for (let i = 0; i < this.#startWatches.length; ++i) {
       const source = this.#startWatches[i];
       // TODO(cjihrig): Probably need to implement
       // Source.prototype.waitForSync() and call that here instead.
+      this.#sources.push(source);
       source.start(this.#context.child(), this.#queue);
     }
 
@@ -119,6 +127,24 @@ export class Controller {
   }
 
   /**
+   * stop() causes the controller to stop consuming events. If the controller
+   * was already stopped, this is a no-op.
+   * @returns {Promise<void>}
+   */
+  async stop() {
+    if (!this.#started) {
+      return;
+    }
+
+    const promises = this.#sources.map((source) => {
+      return source.stop();
+    });
+
+    await Promise.allSettled(promises);
+    this.#started = false;
+  }
+
+  /**
    * watch() begins watching a Source for events.
    * @param {Source} source - Source to watch for events.
    */
@@ -128,6 +154,7 @@ export class Controller {
       return;
     }
 
+    this.#sources.push(source);
     source.start(this.#context.child(), this.#queue);
   }
 

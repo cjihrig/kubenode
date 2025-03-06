@@ -128,6 +128,11 @@ export class Source {
     });
 
     await this.informer.start();
+
+    context.signal.addEventListener('abort', () => {
+      this.stop();
+    });
+
     this.#started = true;
   }
 
@@ -137,6 +142,20 @@ export class Source {
    */
   get started() {
     return this.#started;
+  }
+
+  /**
+   * stop() causes the Source to stop watching for and reporting events. If the
+   * Source was already stopped, this is a no-op.
+   * @returns {Promise<void>}
+   */
+  async stop() {
+    if (!this.#started) {
+      return;
+    }
+
+    await this.informer.stop();
+    this.#started = false;
   }
 }
 

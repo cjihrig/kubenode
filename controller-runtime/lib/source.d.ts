@@ -30,6 +30,12 @@ export class Source {
      * @type {boolean}
      */
     get started(): boolean;
+    /**
+     * stop() causes the Source to stop watching for and reporting events. If the
+     * Source was already stopped, this is a no-op.
+     * @returns {Promise<void>}
+     */
+    stop(): Promise<void>;
     #private;
 }
 declare namespace _default {
