@@ -47,6 +47,8 @@ export class Manager {
   #controllers;
   /** @type LeaderElector */
   #leaderElector;
+  /** @type boolean */
+  #started;
   /** @type Server */
   #webhookServer;
 
@@ -166,7 +168,7 @@ export class Manager {
     this.client = client;
     this.#controllers = [];
     this.kubeconfig = kubeconfig;
-    this.started = false;
+    this.#started = false;
     this.#webhookServer = null;
   }
 
@@ -196,11 +198,9 @@ export class Manager {
    * @returns {Promise<void>}
    */
   async start(context = Context.create()) {
-    if (this.started) {
+    if (this.#started) {
       throw new Error('manager already started');
     }
-
-    this.started = true;
 
     // Webhooks can start before leader election.
     if (this.#webhookServer !== null) {
@@ -212,6 +212,16 @@ export class Manager {
     } else {
       this.#startControllers(context);
     }
+
+    this.#started = true;
+  }
+
+  /**
+   * A boolean indicating if the manager was started.
+   * @type {boolean}
+   */
+  get started() {
+    return this.#started;
   }
 
   /**

@@ -15,6 +15,9 @@ import { Request } from './reconcile.js';
  * Source provides event streams to hook up to Controllers.
  */
 export class Source {
+  /** @type boolean */
+  #started;
+
   /**
    * Construct a Source.
    * @param {KubeConfig} kubeconfig - Kubeconfig to use.
@@ -44,6 +47,7 @@ export class Source {
     this.kind = kind;
     this.apiVersion = apiVersion;
     this.informer = null;
+    this.#started = false;
   }
 
   /**
@@ -59,6 +63,10 @@ export class Source {
 
     if (!(queue instanceof Queue)) {
       throw new TypeError('queue must be a Queue instance');
+    }
+
+    if (this.#started) {
+      throw new Error('source already started');
     }
 
     let apiVersion = this.apiVersion;
@@ -119,7 +127,16 @@ export class Source {
       queue.enqueue(k8sObjectToRequest(resource));
     });
 
-    return this.informer.start();
+    await this.informer.start();
+    this.#started = true;
+  }
+
+  /**
+   * A boolean indicating if the source was started.
+   * @type {boolean}
+   */
+  get started() {
+    return this.#started;
   }
 }
 

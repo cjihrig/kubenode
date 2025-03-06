@@ -25,6 +25,12 @@ export class Source {
      * @returns {Promise<void>}
      */
     start(context: Context, queue: Queue<Request>): Promise<void>;
+    /**
+     * A boolean indicating if the source was started.
+     * @type {boolean}
+     */
+    get started(): boolean;
+    #private;
 }
 declare namespace _default {
     export { Source };

@@ -152,6 +152,7 @@ suite('Manager', () => {
       const manager = new Manager(options);
       manager.start(ctx);
 
+      assert.strictEqual(manager.started, true);
       await assert.rejects(() => {
         return manager.start(ctx);
       }, /manager already started/);

@@ -16,6 +16,7 @@ suite('Source', () => {
       assert.strictEqual(source.client, o.client);
       assert.strictEqual(source.kind, o.kind);
       assert.strictEqual(source.apiVersion, o.apiVersion);
+      assert.strictEqual(source.started, false);
     });
 
     test('kubeconfig argument must be a KubeConfig instance', () => {

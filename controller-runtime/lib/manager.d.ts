@@ -9,7 +9,6 @@ export class Manager {
     constructor(options?: ManagerOptions);
     client: KubernetesObjectApi;
     kubeconfig: KubeConfig;
-    started: boolean;
     /**
      * add() causes the Manager to manage the provided controller.
      * @param {Controller} controller The controller to manage.
@@ -26,6 +25,11 @@ export class Manager {
      * @returns {Promise<void>}
      */
     start(context?: Context): Promise<void>;
+    /**
+     * A boolean indicating if the manager was started.
+     * @type {boolean}
+     */
+    get started(): boolean;
     #private;
 }
 declare namespace _default {
