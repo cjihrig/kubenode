@@ -72,7 +72,6 @@ export class Manager {
       coordinationClient,
       coreClient,
       kubeconfig,
-      // TODO(cjihrig): Default this to true once the generated code is ready.
       leaderElection = false,
       leaderElectionName = '',
       leaderElectionNamespace = '',
