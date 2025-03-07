@@ -30,6 +30,12 @@ export class Manager {
      * @type {boolean}
      */
     get started(): boolean;
+    /**
+     * stop() causes the manager to stop all resources that it manages. If the
+     * manager was already stopped, this is a no-op.
+     * @returns {Promise<void>}
+     */
+    stop(): Promise<void>;
     #private;
 }
 declare namespace _default {
@@ -37,6 +43,7 @@ declare namespace _default {
 }
 export default _default;
 export type Controller = import("./controller.js").Controller;
+export type PromiseWithResolvers = import("./util.js").PromiseWithResolvers;
 export type ManagerOptions = {
     /**
      * - Kubeconfig to use.

@@ -136,7 +136,8 @@ suite('Manager', () => {
       const controller = {
         start() {
           startedController.resolve();
-        }
+        },
+        stop() {}
       };
       manager.add(controller);
       manager.start(ctx);
@@ -158,6 +159,68 @@ suite('Manager', () => {
       }, /manager already started/);
       ctx.cancel();
       await assert.rejects(ctx.done);
+    });
+  });
+
+  suite('Manager.prototype.stop()', () => {
+    test('stops the controllers without leader election', async () => {
+      const startedController = withResolvers();
+      const stoppedController = withResolvers();
+      const ctx = Context.create();
+      const options = getManagerOptions();
+      options.leaderElection = false;
+      const manager = new Manager(options);
+      const controller = {
+        start() {
+          startedController.resolve();
+        },
+        stop() {
+          stoppedController.resolve();
+        }
+      };
+      manager.add(controller);
+      manager.start(ctx);
+      await startedController.promise;
+      assert.strictEqual(manager.started, true);
+      assert.strictEqual(await manager.stop(), undefined);
+      await stoppedController.promise;
+      assert.strictEqual(manager.started, false);
+    });
+
+    test('stops the controllers without leader election using cancellation', async () => {
+      const startedController = withResolvers();
+      const stoppedController = withResolvers();
+      const ctx = Context.create();
+      const options = getManagerOptions();
+      options.leaderElection = false;
+      const manager = new Manager(options);
+      const controller = {
+        start() {
+          startedController.resolve();
+        },
+        stop() {
+          stoppedController.resolve();
+        }
+      };
+      manager.add(controller);
+      manager.start(ctx);
+      await startedController.promise;
+      assert.strictEqual(manager.started, true);
+      ctx.cancel();
+      await assert.rejects(ctx.done);
+      await stoppedController.promise;
+      assert.strictEqual(manager.started, false);
+    });
+
+    test('is a no-op if the manager is not started', async () => {
+      const options = getManagerOptions();
+      const manager = new Manager(options);
+
+      assert.strictEqual(manager.started, false);
+      assert.strictEqual(await manager.stop(), undefined);
+      assert.strictEqual(manager.started, false);
+      assert.strictEqual(await manager.stop(), undefined);
+      assert.strictEqual(manager.started, false);
     });
   });
 });

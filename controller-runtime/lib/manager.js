@@ -10,10 +10,12 @@ import { Context } from './context.js';
 import { LeaderElector } from './leaderelection/leaderelection.js';
 import { LeaseLock } from './leaderelection/leaselock.js';
 import { EventRecorder } from './record/recorder.js';
+import { withResolvers } from './util.js';
 import { Server } from './webhook/server.js';
 
 /**
  * @typedef {import('./controller.js').Controller} Controller
+ * @typedef {import('./util.js').PromiseWithResolvers} PromiseWithResolvers
  *
  * @typedef {Object} ManagerOptions
  * @property {KubeConfig} [kubeconfig] - Kubeconfig to use.
@@ -47,6 +49,10 @@ export class Manager {
   #controllers;
   /** @type LeaderElector */
   #leaderElector;
+  /** @type Context */
+  #leaderElectorContext;
+  /** @type PromiseWithResolvers */
+  #leaderElectorDone;
   /** @type boolean */
   #started;
   /** @type Server */
@@ -155,19 +161,23 @@ export class Manager {
           onStartedLeading(ctx) {
             this.#startControllers(ctx);
           },
-          onStoppedLeading() {
-
+          async onStoppedLeading() {
+            await this.#stopControllers();
+            this.#leaderElectorDone.resolve();
           },
         },
       };
       this.#leaderElector = new LeaderElector(electorOptions);
+      this.#leaderElectorDone = withResolvers();
     } else {
       this.#leaderElector = null;
+      this.#leaderElectorDone = null;
     }
 
     this.client = client;
     this.#controllers = [];
     this.kubeconfig = kubeconfig;
+    this.#leaderElectorContext = null;
     this.#started = false;
     this.#webhookServer = null;
   }
@@ -202,13 +212,18 @@ export class Manager {
       throw new Error('manager already started');
     }
 
+    context.signal.addEventListener('abort', () => {
+      this.stop();
+    });
+
     // Webhooks can start before leader election.
     if (this.#webhookServer !== null) {
       await this.#webhookServer.start(context.child());
     }
 
     if (this.#leaderElector !== null) {
-      this.#leaderElector.run(context.child());
+      this.#leaderElectorContext = context.child();
+      this.#leaderElector.run(this.#leaderElectorContext);
     } else {
       this.#startControllers(context);
     }
@@ -225,6 +240,32 @@ export class Manager {
   }
 
   /**
+   * stop() causes the manager to stop all resources that it manages. If the
+   * manager was already stopped, this is a no-op.
+   * @returns {Promise<void>}
+   */
+  async stop() {
+    if (!this.#started) {
+      return;
+    }
+
+    if (this.#leaderElectorContext !== null) {
+      this.#leaderElectorContext.cancel();
+      await this.#leaderElectorDone.promise;
+    } else {
+      await this.#stopControllers();
+    }
+
+    // Wait to shut down the webhook server until the controllers are no longer
+    // generating any activity.
+    if (this.#webhookServer !== null) {
+      await this.#webhookServer.stop();
+    }
+
+    this.#started = false;
+  }
+
+  /**
    * startControllers() starts all managed controllers. This should not be
    * called until the manager becomes the leader.
    * @param {Context} ctx The context to use.
@@ -233,6 +274,17 @@ export class Manager {
     for (let i = 0; i < this.#controllers.length; ++i) {
       this.#controllers[i].start(ctx.child());
     }
+  }
+
+  /**
+   * stopControllers() stops all managed controllers.
+   */
+  async #stopControllers() {
+    const promises = this.#controllers.map((controller) => {
+      return controller.stop();
+    });
+
+    await Promise.allSettled(promises);
   }
 }
 
