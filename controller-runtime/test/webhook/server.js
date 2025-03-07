@@ -165,26 +165,79 @@ test('denies request if response is invalid', async () => {
 suite('Server.prototype.start()', () => {
   test('insecure server can be started', async (t) => {
     const s = new Server({ insecure: true, port: 0 });
-    t.after(() => {
+    t.after(async () => {
       try {
-        s.server.close();
+        await s.stop();
       } catch {}
     });
     assert.strictEqual(s.started, false);
-    await s.start();
+    await s.start(Context.create());
     assert.strictEqual(s.started, true);
+  });
+
+  test('throws if context is not a Context instance', async () => {
+    const s = new Server({ insecure: true, port: 0 });
+
+    await assert.rejects(async () => {
+      await s.start(null);
+    });
   });
 
   test('throws if the server is already started', async (t) => {
     const s = new Server({ insecure: true, port: 0 });
-    t.after(() => {
+    t.after(async () => {
       try {
-        s.server.close();
+        await s.stop();
       } catch {}
     });
-    await s.start();
+    await s.start(Context.create());
     await assert.rejects(async () => {
-      await s.start();
+      await s.start(Context.create());
     }, /server already started/);
+  });
+});
+
+suite('Server.prototype.stop()', () => {
+  test('stops a running server', async (t) => {
+    const s = new Server({ insecure: true, port: 0 });
+    t.after(async () => {
+      try {
+        await s.stop();
+      } catch {}
+    });
+    assert.strictEqual(s.started, false);
+    await s.start(Context.create());
+    assert.strictEqual(s.started, true);
+    await s.stop();
+    assert.strictEqual(s.started, false);
+  });
+
+  test('is a no-op if the server is already stopped', async () => {
+    const s = new Server({ insecure: true, port: 0 });
+
+    assert.strictEqual(s.started, false);
+    await s.stop();
+    assert.strictEqual(s.started, false);
+    await s.stop();
+    assert.strictEqual(s.started, false);
+    await s.stop();
+  });
+
+  test('is called when the starting context is cancelled', async (t) => {
+    const s = new Server({ insecure: true, port: 0 });
+    t.after(async () => {
+      try {
+        await s.stop();
+      } catch {}
+    });
+
+    t.mock.method(Server.prototype, 'stop');
+    const ctx = Context.create();
+    await s.start(ctx);
+    assert.strictEqual(s.started, true);
+    assert.strictEqual(s.stop.mock.callCount(), 0);
+    ctx.cancel();
+    await assert.rejects(ctx.done);
+    assert.strictEqual(s.stop.mock.callCount(), 1);
   });
 });

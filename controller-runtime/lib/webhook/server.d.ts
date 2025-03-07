@@ -15,13 +15,6 @@ export class Server {
      * @param {ServerOptions} [options] Options used to construct instance.
      */
     constructor(options?: ServerOptions);
-    context: Context;
-    port: number;
-    /** @type RequestListener */
-    requestHandler: RequestListener;
-    /** @type Map<string, function> */
-    router: Map<string, Function>;
-    server: import("http").Server<typeof import("http").IncomingMessage, typeof import("http").ServerResponse> | import("https").Server<typeof import("http").IncomingMessage, typeof import("http").ServerResponse>;
     /**
      * inject() creates a simulated request in the server.
      * @param {Object} settings Simulated request configuration.
@@ -36,15 +29,22 @@ export class Server {
     register(path: string, hook: Function): void;
     /**
      * start() runs the server.
-     * @param {Context} ctx The context object.
+     * @param {Context} context The context object.
      * @returns {Promise<void>}
      */
-    start(ctx: Context): Promise<void>;
+    start(context: Context): Promise<void>;
     /**
      * A boolean indicating if the manager was started.
      * @type {boolean}
      */
     get started(): boolean;
+    /**
+     * stop() causes the server to stop listening for connections. If the server
+     * was already stopped, this is a no-op.
+     * @returns {Promise<void>}
+     */
+    stop(): Promise<void>;
+    #private;
 }
 declare namespace _default {
     export { Server };
@@ -52,7 +52,9 @@ declare namespace _default {
 export default _default;
 export type RequestListener = import("node:http").RequestListener;
 export type IncomingMessage = import("node:http").IncomingMessage;
+export type InsecureServer = import("node:http").Server;
 export type ServerResponse = import("node:http").ServerResponse;
+export type SecureServer = import("node:https").Server;
 export type ServerOptions = {
     /**
      * The directory that contains the server key and certificate.

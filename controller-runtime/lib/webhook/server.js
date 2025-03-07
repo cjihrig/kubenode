@@ -15,7 +15,9 @@ import { withResolvers } from '../util.js';
 /**
  * @typedef {import('node:http').RequestListener} RequestListener
  * @typedef {import('node:http').IncomingMessage} IncomingMessage
+ * @typedef {import('node:http').Server} InsecureServer
  * @typedef {import('node:http').ServerResponse} ServerResponse
+ * @typedef {import('node:https').Server} SecureServer
  */
 
 const kContentTypeHeader = 'content-type';
@@ -42,6 +44,17 @@ const kResponseHeaders = { [kContentTypeHeader]: kContentTypeValue };
  * Server is a generic Kubernetes webhook server.
  */
 export class Server {
+  /** @type Context | null */
+  #context;
+  /** @type number */
+  #port;
+  /** @type RequestListener */
+  #requestHandler;
+  /** @type Map<string, function> */
+  #router;
+  /** @type SecureServer | InsecureServer */
+  #server;
+
   /**
    * Creates a new Server instance.
    * @param {ServerOptions} [options] Options used to construct instance.
@@ -81,25 +94,23 @@ export class Server {
       throw new TypeError('options.port must be a number');
     }
 
-    this.context = null;
-    this.port = port;
-    /** @type RequestListener */
-    this.requestHandler = requestHandler.bind(this);
-    /** @type Map<string, function> */
-    this.router = new Map();
+    this.#context = null;
+    this.#port = port;
+    this.#requestHandler = this.#handler.bind(this);
+    this.#router = new Map();
 
     if (insecure) {
       // Insecure servers are useful for local testing, but cannot be used in a
       // Kubernetes cluster because webhooks must use HTTPS.
       const serverOptions = { requestTimeout: kMaxRequestTimeout };
-      this.server = createServer(serverOptions, this.requestHandler);
+      this.#server = createServer(serverOptions, this.#requestHandler);
     } else {
       const serverOptions = {
         cert: readFileSync(join(certDir, certName)),
         key: readFileSync(join(certDir, keyName)),
         requestTimeout: kMaxRequestTimeout
       };
-      this.server = createSecureServer(serverOptions, this.requestHandler);
+      this.#server = createSecureServer(serverOptions, this.#requestHandler);
     }
   }
 
@@ -148,7 +159,7 @@ export class Server {
     // @ts-ignore
     req.headers = settings.headers ?? {};
     // @ts-ignore
-    this.requestHandler(req, res);
+    this.#requestHandler(req, res);
 
     return promise;
   }
@@ -167,31 +178,39 @@ export class Server {
       throw new TypeError('hook must be a function');
     }
 
-    if (this.router.has(path)) {
+    if (this.#router.has(path)) {
       throw new Error(`cannot register duplicate path: '${path}'`);
     }
 
-    this.router.set(path, hook);
+    this.#router.set(path, hook);
   }
 
   /**
    * start() runs the server.
-   * @param {Context} ctx The context object.
+   * @param {Context} context The context object.
    * @returns {Promise<void>}
    */
-  start(ctx) {
-    if (this.server.listening) {
+  start(context) {
+    if (!(context instanceof Context)) {
+      throw new TypeError('context must be a Context instance');
+    }
+
+    if (this.#server.listening) {
       throw new Error('server already started');
     }
 
     const { promise, resolve, reject } = withResolvers();
 
-    this.context = ctx;
-    this.server.listen(this.port, (err) => {
+    this.#context = context;
+    this.#server.listen(this.#port, (err) => {
       if (err) {
         reject(err);
         return;
       }
+
+      context.signal.addEventListener('abort', () => {
+        this.stop();
+      });
 
       resolve();
     });
@@ -203,49 +222,67 @@ export class Server {
    * @type {boolean}
    */
   get started() {
-    return this.server.listening;
-  }
-}
-
-/**
- * requestHandler() handles an individual HTTP request.
- * @this {Server}
- * @param {IncomingMessage} req The HTTP request object.
- * @param {ServerResponse} res The HTTP response object.
- * @returns {Promise<void>}
- */
-async function requestHandler(req, res) {
-  const url = new URL(req.url, 'http://localhost');
-  const hook = this.router.get(url.pathname);
-  if (hook === undefined) {
-    res.writeHead(404).end();
-    return;
+    return this.#server.listening;
   }
 
-  let review;
-
-  try {
-    if (req.headers[kContentTypeHeader] !== kContentTypeValue) {
-      throw new Error('received unexpected content-type');
+  /**
+   * stop() causes the server to stop listening for connections. If the server
+   * was already stopped, this is a no-op.
+   * @returns {Promise<void>}
+   */
+  async stop() {
+    if (!this.#server.listening) {
+      return;
     }
 
-    review = await readAdmissionReview(req);
-  } catch (err) {
-    return writeAdmissionResponse(res, errored(400, err));
+    const { promise, resolve } = withResolvers();
+
+    this.#server.close(() => {
+      resolve();
+    });
+    return promise;
   }
 
-  try {
-    const ctx = this.context ? this.context.child() : Context.create();
-    let response = hook(ctx, review.request);
-
-    if (!(response instanceof AdmissionResponse)) {
-      response = new AdmissionResponse(response);
+  /**
+   * handler() handles an individual HTTP request.
+   * @this {Server}
+   * @param {IncomingMessage} req The HTTP request object.
+   * @param {ServerResponse} res The HTTP response object.
+   * @returns {Promise<void>}
+   */
+  async #handler(req, res) {
+    const url = new URL(req.url, 'http://localhost');
+    const hook = this.#router.get(url.pathname);
+    if (hook === undefined) {
+      res.writeHead(404).end();
+      return;
     }
 
-    response.complete(review.request);
-    writeAdmissionResponse(res, response);
-  } catch (err) {
-    writeAdmissionResponse(res, errored(500));
+    let review;
+
+    try {
+      if (req.headers[kContentTypeHeader] !== kContentTypeValue) {
+        throw new Error('received unexpected content-type');
+      }
+
+      review = await readAdmissionReview(req);
+    } catch (err) {
+      return writeAdmissionResponse(res, errored(400, err));
+    }
+
+    try {
+      const ctx = this.#context ? this.#context.child() : Context.create();
+      let response = hook(ctx, review.request);
+
+      if (!(response instanceof AdmissionResponse)) {
+        response = new AdmissionResponse(response);
+      }
+
+      response.complete(review.request);
+      writeAdmissionResponse(res, response);
+    } catch (err) {
+      writeAdmissionResponse(res, errored(500));
+    }
   }
 }
 
