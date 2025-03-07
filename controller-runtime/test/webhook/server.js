@@ -1,5 +1,5 @@
 import assert from 'node:assert';
-import { test } from 'node:test';
+import { suite, test } from 'node:test';
 import { Context } from '../../lib/context.js';
 import admission from '../../lib/webhook/admission.js';
 import { Server } from '../../lib/webhook/server.js';
@@ -162,12 +162,29 @@ test('denies request if response is invalid', async () => {
   });
 });
 
-test('insecure server can be started', async (t) => {
-  const s = new Server({ insecure: true, port: 0 });
-  t.after(() => {
-    try {
-      s.server.close();
-    } catch {}
+suite('Server.prototype.start()', () => {
+  test('insecure server can be started', async (t) => {
+    const s = new Server({ insecure: true, port: 0 });
+    t.after(() => {
+      try {
+        s.server.close();
+      } catch {}
+    });
+    assert.strictEqual(s.started, false);
+    await s.start();
+    assert.strictEqual(s.started, true);
   });
-  await s.start();
+
+  test('throws if the server is already started', async (t) => {
+    const s = new Server({ insecure: true, port: 0 });
+    t.after(() => {
+      try {
+        s.server.close();
+      } catch {}
+    });
+    await s.start();
+    await assert.rejects(async () => {
+      await s.start();
+    }, /server already started/);
+  });
 });

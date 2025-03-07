@@ -40,6 +40,12 @@ export class Server {
      * @returns {Promise<void>}
      */
     start(ctx: Context): Promise<void>;
+    /**
+     * A boolean indicating if the manager was started.
+     * @type {boolean}
+     */
+    get started(): boolean;
+    #private;
 }
 declare namespace _default {
     export { Server };
