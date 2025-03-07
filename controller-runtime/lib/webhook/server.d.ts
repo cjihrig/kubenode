@@ -45,7 +45,6 @@ export class Server {
      * @type {boolean}
      */
     get started(): boolean;
-    #private;
 }
 declare namespace _default {
     export { Server };

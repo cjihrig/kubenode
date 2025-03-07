@@ -42,9 +42,6 @@ const kResponseHeaders = { [kContentTypeHeader]: kContentTypeValue };
  * Server is a generic Kubernetes webhook server.
  */
 export class Server {
-  /** @type boolean */
-  #started;
-
   /**
    * Creates a new Server instance.
    * @param {ServerOptions} [options] Options used to construct instance.
@@ -84,7 +81,6 @@ export class Server {
       throw new TypeError('options.port must be a number');
     }
 
-    this.#started = false;
     this.context = null;
     this.port = port;
     /** @type RequestListener */
@@ -184,17 +180,15 @@ export class Server {
    * @returns {Promise<void>}
    */
   start(ctx) {
-    if (this.#started) {
+    if (this.server.listening) {
       throw new Error('server already started');
     }
 
-    this.#started = true;
     const { promise, resolve, reject } = withResolvers();
 
     this.context = ctx;
     this.server.listen(this.port, (err) => {
       if (err) {
-        this.#started = false;
         reject(err);
         return;
       }
@@ -209,7 +203,7 @@ export class Server {
    * @type {boolean}
    */
   get started() {
-    return this.#started;
+    return this.server.listening;
   }
 }
 
