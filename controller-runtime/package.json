@@ -1,6 +1,6 @@
 {
   "name": "@kubenode/controller-runtime",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "Kubernetes controller runtime",
   "license": "MIT",
   "author": "Colin J. Ihrig <cjihrig@gmail.com> (http://www.cjihrig.com/)",
