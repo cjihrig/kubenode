@@ -30,7 +30,7 @@ function main(data) {
 
 const manager = new Manager();
 // @kubenode:scaffold:manager
-manager.start();
+await manager.start();
 `;
 }
 
