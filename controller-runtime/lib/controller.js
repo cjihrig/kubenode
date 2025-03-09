@@ -18,6 +18,8 @@ import { Queue } from './queue.js';
 export class Controller {
   /** @type Context */
   #context;
+  /** @type boolean */
+  #isReconciling;
   /** @type string */
   #name;
   /** @type Queue<Request> */
@@ -54,6 +56,7 @@ export class Controller {
     }
 
     this.#context = null;
+    this.#isReconciling = false;
     this.#name = name;
     this.#queue = new Queue();
     this.#reconciler = reconciler;
@@ -93,14 +96,21 @@ export class Controller {
 
     this.#started = true;
     this.#context = context;
-    this.#queue.on('data', () => {
-      const data = this.#queue.dequeue();
 
-      if (data === undefined) {
+    this.#queue.on('data', async () => {
+      if (this.#isReconciling) {
         return;
       }
 
-      this.#reconcileHandler(context, data.data);
+      while (true) {
+        const data = this.#queue.dequeue();
+
+        if (data === undefined) {
+          break;
+        }
+
+        await this.#reconcileHandler(context, data.data);
+      }
     });
 
     context.signal.addEventListener('abort', () => {
@@ -168,6 +178,8 @@ export class Controller {
   async #reconcileHandler(context, request) {
     let result;
 
+    this.#isReconciling = true;
+
     try {
       result = await this.reconcile(context, request);
 
@@ -187,6 +199,8 @@ export class Controller {
         this.#queue.enqueue(request);
       }
     }
+
+    this.#isReconciling = false;
   }
 }
 

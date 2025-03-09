@@ -272,5 +272,34 @@ suite('Controller', () => {
       });
       await waiter.promise;
     });
+
+    test('ensures requests are handled serially', async () => {
+      const ctx = Context.create();
+      const source = new TestSource();
+      const reconciler = new TestReconciler();
+      const controller = new Controller('foo', { reconciler });
+      const waiter = withResolvers();
+      let cnt = 0;
+
+      reconciler.reconcile = function (context, request) {
+        cnt++;
+
+        if (cnt === 1) {
+          assert.strictEqual(source.queue.data.length, 0);
+          source.queue.enqueue(new Request('bar', 'baz'));
+          source.queue.enqueue(new Request('bar', 'baz'));
+        } else if (cnt === 2) {
+          assert.strictEqual(source.queue.data.length, 1);
+        } else if (cnt === 3) {
+          assert.strictEqual(source.queue.data.length, 0);
+          waiter.resolve();
+        }
+      };
+
+      controller.watch(source);
+      controller.start(ctx);
+      source.queue.enqueue(new Request('bar', 'baz'));
+      await waiter.promise;
+    });
   });
 });
