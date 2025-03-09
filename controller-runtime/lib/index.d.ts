@@ -1,6 +1,7 @@
 declare namespace _default {
     export { k8s };
     export { apimachinery };
+    export { Context };
     export { controllerutil };
     export { Manager };
     export { newControllerManagedBy };
@@ -21,6 +22,7 @@ export namespace apimachinery {
     export { schema };
     export { types };
 }
+import { Context } from './context.js';
 import controllerutil from './controllerutil.js';
 import { Manager } from './manager.js';
 export const newControllerManagedBy: typeof Builder.controllerManagedBy;
@@ -40,4 +42,4 @@ import types from './apimachinery/types.js';
 import { Builder } from './builder.js';
 import admission from './webhook/admission.js';
 import { Server } from './webhook/server.js';
-export { k8s, controllerutil, Manager, Reconciler, Request, Result, Source, TerminalError };
+export { k8s, Context, controllerutil, Manager, Reconciler, Request, Result, Source, TerminalError };

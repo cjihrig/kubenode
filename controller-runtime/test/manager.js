@@ -1,7 +1,6 @@
 import assert from 'node:assert';
 import { suite, test } from 'node:test';
-import { Manager } from '../lib/manager.js';
-import { Context } from '../lib/context.js';
+import { Context, Manager } from '../lib/index.js';
 import { withResolvers } from '../lib/util.js';
 import { getManagerOptions } from './test-utils.js';
 

@@ -4,6 +4,7 @@ import metav1 from './apimachinery/meta/v1.js';
 import schema from './apimachinery/schema.js';
 import types from './apimachinery/types.js';
 import { Builder } from './builder.js';
+import { Context } from './context.js';
 import controllerutil from './controllerutil.js';
 import { Manager } from './manager.js';
 import {
@@ -33,6 +34,7 @@ const webhook = {
 export {
   k8s,
   apimachinery,
+  Context,
   controllerutil,
   Manager,
   newControllerManagedBy,
@@ -47,6 +49,7 @@ export {
 export default {
   k8s,
   apimachinery,
+  Context,
   controllerutil,
   Manager,
   newControllerManagedBy,

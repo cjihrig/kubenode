@@ -1,6 +1,7 @@
 import assert from 'node:assert';
 import { suite, test } from 'node:test';
-import { Context, ReconcileContext } from '../lib/context.js';
+import { Context } from '../lib/index.js';
+import { ReconcileContext } from '../lib/context.js';
 
 suite('Context', () => {
   suite('Context() constructor', () => {
