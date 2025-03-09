@@ -14,6 +14,13 @@ suite('Manager', () => {
       assert.strictEqual(manager.started, false);
     });
 
+    test('can be called with no arguments', () => {
+      const manager = new Manager();
+
+      assert.strictEqual(manager instanceof Manager, true);
+      assert.strictEqual(manager.started, false);
+    });
+
     test('options must be an object', () => {
       assert.throws(() => {
         new Manager(null);

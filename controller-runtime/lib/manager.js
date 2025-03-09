@@ -62,7 +62,7 @@ export class Manager {
    * Construct a Manager.
    * @param {ManagerOptions} [options] - Configuration options.
    */
-  constructor(options) {
+  constructor(options = {}) {
     if (options === null || typeof options !== 'object') {
       throw new TypeError('options must be an object');
     }
