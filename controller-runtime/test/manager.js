@@ -15,10 +15,18 @@ suite('Manager', () => {
     });
 
     test('can be called with no arguments', () => {
-      const manager = new Manager();
+      try {
+        const manager = new Manager();
 
-      assert.strictEqual(manager instanceof Manager, true);
-      assert.strictEqual(manager.started, false);
+        assert.strictEqual(manager instanceof Manager, true);
+        assert.strictEqual(manager.started, false);
+      } catch (err) {
+        // This can throw when trying to create an API client with no
+        // active cluster.
+        if (err.message !== 'No active cluster!') {
+          throw err;
+        }
+      }
     });
 
     test('options must be an object', () => {
