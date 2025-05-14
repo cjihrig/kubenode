@@ -1,6 +1,6 @@
 {
   "name": "kubenode",
-  "version": "0.2.5",
+  "version": "0.3.0",
   "description": "Kubernetes and Node.js",
   "license": "MIT",
   "author": "Colin J. Ihrig <cjihrig@gmail.com> (http://www.cjihrig.com/)",
@@ -9,7 +9,7 @@
   },
   "scripts": {},
   "dependencies": {
-    "@kubenode/cli": "^0.1.9"
+    "@kubenode/cli": "^0.1.10"
   },
   "homepage": "https://github.com/cjihrig/kubenode#readme",
   "repository": {
