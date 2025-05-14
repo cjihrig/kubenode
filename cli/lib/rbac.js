@@ -21,17 +21,18 @@ function updateManagerRole(filename, data) {
   // @ts-ignore
   role.rules ??= [];
   const plural = pluralize(data.kind.toLowerCase());
+  const status = `${plural}/status`;
   // @ts-ignore
   const rule = role.rules.find((r) => {
     return isDeepStrictEqual(r?.apiGroups, [data.group]) &&
-      isDeepStrictEqual(r?.resources, [plural]);
+      isDeepStrictEqual(r?.resources, [plural, status]);
   });
 
   if (rule === undefined) {
     // @ts-ignore
     role.rules.push({
       apiGroups: [data.group],
-      resources: [plural],
+      resources: [plural, status],
       verbs: ['create', 'delete', 'get', 'list', 'patch', 'update', 'watch']
     });
   }
