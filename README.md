@@ -5,7 +5,7 @@ Kubenode is a set of modules and tools for working with Kubernetes in Node.js.
 ## Quick start guide
 
 This section demonstrates the process of creating a new Kubernetes Custom
-Resource Definition (CRD) and corresponding controller using the Kubenode CLI.
+Resource Definition (CRD) and corresponding controller using the Kubenode CLI. This is meant to get up and running quickly. [A more in depth guide is available on my blog](https://cjihrig.com/kubernetes-controllers-in-nodejs).
 
 Initialize a new Kubenode project using the following command. This command will
 create a number of files and directories in the current directory.
