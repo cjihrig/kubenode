@@ -1,3 +1,5 @@
+THIS REPO HAS BEEN ARCHIVED DUE TO LACK OF INTEREST FROM THE COMMUNITY. FEEL FREE TO REACH OUT TO ME IF YOU'D LIKE TO DISCUSS IT.
+
 # kubenode
 
 Kubenode is a set of modules and tools for working with Kubernetes in Node.js.
